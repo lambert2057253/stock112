@@ -275,8 +275,9 @@ def handle_message(event):
         if img_url == "no": line_bot_api.push_message(uid, TextSendMessage('股票代碼錯誤'))
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=img_url, preview_image_url=img_url))
 
-    elif re.match('#[0-9]+', msg):  # 查詢股票
-        stockNumber = msg[1:]
+    elif re.search('#[0-9]+', msg):# 查詢股票
+        match = re.search('#[0-9]+', msg)  # 獲取匹配結果
+        stockNumber = match.group()[1:]
         stockName = stockprice.get_stock_name(stockNumber)
         if stockName == "no": 
             line_bot_api.push_message(uid, TextSendMessage("股票代碼錯誤"))
