@@ -21,22 +21,21 @@ emoji_downinfo = u'\U0001F60A'
 
 def get_stock_name(stockNumber):
     try:
-        # 使用 pandas_datareader 驗證股票代碼
+        # 先驗證股票代碼是否有效
         stock = pdr.DataReader(stockNumber + '.TW', 'yahoo', end=datetime.datetime.now())
-        # 可選：從其他來源獲取名稱，或直接返回代碼
+        # 嘗試從網頁獲取名稱
         url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
-        page = requests.get(url)
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, 'html.parser')
-        table = soup.find_all(text='成交')
-        if not table:
-            return stockNumber  # 若爬蟲失敗，返回代碼
-        table = table[0].parent.parent.parent
-        stock_name = table.select('tr')[1].select('td')[0].text.strip('加到投資組合')
-        return stock_name
+        name_tag = soup.find('h1')  # 根據實際結構調整
+        if name_tag:
+            return name_tag.text.strip()
+        return stockNumber  # 若無法獲取名稱，返回代碼
     except Exception as e:
-        print(f"Error in get_stock_name: {e}")
+        print(f"Error: {e}")
         return "no"
-
+        
 # 使用者查詢股票
 def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
