@@ -21,14 +21,34 @@ emoji_downinfo = u'\U0001F60A'
 
 def get_stock_name(stockNumber):
     try:
+        # 使用 pandas_datareader 驗證股票代碼
+        stock = pdr.DataReader(stockNumber + '.TW', 'yahoo', end=datetime.datetime.now())
+        # 可選：從其他來源獲取名稱，或直接返回代碼
         url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
-        table = soup.find_all(text='成交')[0].parent.parent.parent
+        table = soup.find_all(text='成交')
+        if not table:
+            return stockNumber  # 若爬蟲失敗，返回代碼
+        table = table[0].parent.parent.parent
         stock_name = table.select('tr')[1].select('td')[0].text.strip('加到投資組合')
         return stock_name
-    except:
+    except Exception as e:
+        print(f"Error in get_stock_name: {e}")
         return "no"
+
+# 主程式條件
+elif re.match('#[0-9]+', msg):
+    stockNumber = msg[1:]
+    stockName = stockprice.get_stock_name(stockNumber)
+    if stockName == "no":
+        line_bot_api.push_message(uid, TextSendMessage(f"股票代碼 {stockNumber} 錯誤或無法查詢"))
+    else:
+        line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {stockNumber} 的股價中...'))
+        content_text = stockprice.getprice(stockNumber, msg)
+        content = Msg_Template.stock_reply(stockNumber, content_text)
+        line_bot_api.push_message(uid, content)
+    return 0
 
 # 使用者查詢股票
 def getprice(stockNumber, msg):
