@@ -274,11 +274,12 @@ def handle_message(event):
         img_url = stock_compare.show_pic(msg)
         if img_url == "no": line_bot_api.push_message(uid, TextSendMessage('股票代碼錯誤'))
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=img_url, preview_image_url=img_url))
-     elif re.match('#[0-9]+', msg):#查詢股票
+
+    elif re.match('#[0-9]+', msg):  # 查詢股票
         stockNumber = msg[1:]
         stockName = stockprice.get_stock_name(stockNumber)
         if stockName == "no": 
-            line_bot_api.push_message(uid, TextSendMessage(f"股票代碼 {stockNumber} 錯誤或無法查詢"))
+            line_bot_api.push_message(uid, TextSendMessage("股票代碼錯誤"))
         else:          
             line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {stockNumber} 的股價中...'))
             content_text = stockprice.getprice(stockNumber, msg)
