@@ -35,7 +35,7 @@ app = Flask(__name__)
 
 line_bot_api = LineBotApi('bP4+qoMkxVBTp/frpIaE4G1u4mvsPXWgyNIUJuIwdBqP8wHwZHTdEG64EYzgu0boK6ru/zS2n6ACBPp7XIUxlxSUHDrDfZmT2fQRHXhiLnonhByqaPilVH5ejhV2647pAZDg75xeH0mVIbN4Tkd6dQdB04t89/1O/w1cDnyilFU=')
 handler = WebhookHandler('7bf4becaf162f5e885ab92d0afa53630')
-my_user_id = 'U000c4d7379687c73c01bdf37cd326b53'
+my_user_id = 'U85ee49b7fb6269266e497110c4ac6e9c'
 line_bot_api.push_message(my_user_id, TextSendMessage(text="start"))
 @app.route("/")
 def home():
