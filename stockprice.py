@@ -37,19 +37,6 @@ def get_stock_name(stockNumber):
         print(f"Error in get_stock_name: {e}")
         return "no"
 
-# 主程式條件
-elif re.match('#[0-9]+', msg):
-    stockNumber = msg[1:]
-    stockName = stockprice.get_stock_name(stockNumber)
-    if stockName == "no":
-        line_bot_api.push_message(uid, TextSendMessage(f"股票代碼 {stockNumber} 錯誤或無法查詢"))
-    else:
-        line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {stockNumber} 的股價中...'))
-        content_text = stockprice.getprice(stockNumber, msg)
-        content = Msg_Template.stock_reply(stockNumber, content_text)
-        line_bot_api.push_message(uid, content)
-    return 0
-
 # 使用者查詢股票
 def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
