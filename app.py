@@ -3,8 +3,8 @@ Created by Tsung Yu on 17/03/2020.
 Copyright © 2020 Tsung Yu. All rights reserved.
 '''
 import re
-#from pymongo import MongoClient
-#import pymongo
+from pymongo import MongoClient
+import pymongo
 import urllib.parse
 import EXRate
 import news
@@ -38,6 +38,12 @@ handler = WebhookHandler('7bf4becaf162f5e885ab92d0afa53630')
 my_user_id = 'U85ee49b7fb6269266e497110c4ac6e9c'
 line_bot_api.push_message(my_user_id, TextSendMessage(text="start"))
 @app.route("/")
+# MongoDB 連線
+mongo_uri = os.getenv('MONGODB_URI', 'mongodb+srv://davidpatty11:phyozdas369@cluster0.aynxh0o.mongodb.net/stock_db?retryWrites=true&w=majority')
+client = MongoClient(mongo_uri)
+db = client['stock_db']  # 指定資料庫名稱
+collection = db['prices']  # 指定集合名稱
+
 def home():
     return "home"
 # 監聽所有來自 /callback 的 Post Request
