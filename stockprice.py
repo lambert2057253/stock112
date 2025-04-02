@@ -21,21 +21,15 @@ emoji_downinfo = u'\U0001F60A'
 
 def get_stock_name(stockNumber):
     try:
-        # 先驗證股票代碼是否有效
-        stock = pdr.DataReader(stockNumber + '.TW', 'yahoo', end=datetime.datetime.now())
-        # 嘗試從網頁獲取名稱
         url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
-        headers = {'User-Agent': 'Mozilla/5.0'}
-        page = requests.get(url, headers=headers)
+        page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
-        name_tag = soup.find('h1')  # 根據實際結構調整
-        if name_tag:
-            return name_tag.text.strip()
-        return stockNumber  # 若無法獲取名稱，返回代碼
-    except Exception as e:
-        print(f"Error: {e}")
+        table = soup.find_all(text='成交')[0].parent.parent.parent
+        stock_name = table.select('tr')[1].select('td')[0].text.strip('加到投資組合')
+        return stock_name
+    except:
         return "no"
-        
+
 # 使用者查詢股票
 def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
@@ -104,7 +98,7 @@ def show_return(stockNumber, msg):
     plt.show()
     return Imgur.showImgur(msg)
 
-# --------- 畫  股價震盪圖
+# --------- 畫股價震盪圖
 def show_fluctuation(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     end = datetime.datetime.now()
