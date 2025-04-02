@@ -21,13 +21,14 @@ emoji_downinfo = u'\U0001F60A'
 
 def get_stock_name(stockNumber):
     try:
-        url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
-        page = requests.get(url)
+        url = f'https://tw.stock.yahoo.com/quote/{stockNumber}.TW'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+        page = requests.get(url, headers=headers)
         soup = BeautifulSoup(page.content, 'html.parser')
-        table = soup.find_all(text='成交')[0].parent.parent.parent
-        stock_name = table.select('tr')[1].select('td')[0].text.strip('加到投資組合')
+        stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)').text
         return stock_name
-    except:
+    except Exception as e:
+        print(f"Error in get_stock_name: {e}")
         return "no"
 
 # 使用者查詢股票
