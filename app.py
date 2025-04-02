@@ -279,7 +279,7 @@ def handle_message(event):
         stockName = stockprice.get_stock_name(stockNumber)
         if stockName == "no": line_bot_api.push_message(uid, TextSendMessage("股票代碼錯誤"))
         else:          
-            line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {tockNumber} 的股價中...'))
+            line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {stockNumber} 的股價中...'))
             content_text = stockprice.getprice(stockNumber, msg)
             content = Msg_Template.stock_reply(stockNumber, content_text)
             line_bot_api.push_message(uid, content)
