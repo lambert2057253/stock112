@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import pandas_datareader as pdr
 from bs4 import BeautifulSoup
 import Imgur
+import yfinance as yf
 from matplotlib.font_manager import FontProperties # 設定字體
 font_path = matplotlib.font_manager.FontProperties(fname='msjh.ttf')
 
@@ -36,24 +37,26 @@ def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no": return "股票代碼錯誤!"
     content = ""
-    stock = pdr.DataReader(stockNumber+'.TW', 'yahoo',  end=datetime.datetime.now())
-    date = stock.index[-1]
-    price = '%.2f ' % stock["Close"][-1] # 近日之收盤價
-    last_price = '%.2f ' % stock["Close"][-2] # 前一日之收盤價
-    spread_price = '%.2f ' % (float(price) - float(last_price)) # 價差
-    spread_ratio = '%.2f ' % (float(spread_price) / float(last_price)) # 漲跌幅
-    spread_price = spread_price.replace("-",'▽ ') if last_price > price else '△ ' + spread_price
-    spread_ratio = spread_ratio.replace("-",'▽ ') if  last_price > price else '△ ' + spread_ratio
-    open_price = str('%.2f ' % stock["Open"][-1]) # 近日之開盤價
-    high_price = str('%.2f ' % stock["High"][-1])# 近日之盤中高點
-    low_price = str('%.2f ' % stock["Low"][-1]) # 近日之盤中低點
-    price_five = stock.tail(5)["Close"] # 近五日之收盤價
-    stockAverage = str('%.2f ' % pd.to_numeric(price_five).mean())  # 計算近五日平均價格
-    stockSTD = str('%.2f ' % pd.to_numeric(price_five).std())   # 計算近五日標準差  
-    content += f"回報編號{stock_name}的股價{emoji_upinfo}\n--------------\n日期: {date}\n{emoji_midinfo}最新收盤價: {price}\n{emoji_midinfo}開盤價{open_price}\n{emoji_midinfo}最高價: \
-    {high_price}\n{emoji_midinfo}最低價: {low_price}\n{emoji_midinfo}價差: {spread_price} 漲跌幅: {spread_ratio}\n{emoji_midinfo}近五日平均價格: {stockAverage}\n{emoji_midinfo}近五日標準差: {stockSTD}\n"
-    if msg[0] == "#": content += f"--------------\n需要更詳細的資訊，可以點選以下選項進一步查詢唷{emoji_downinfo}"
-    else: content += '\n' 
+    stock = yf.Ticker(stockNumber + '.TW')
+    hist = stock.history(period="5d")  # 獲取近5天的歷史數據
+    if hist.empty:return "無法獲取股票數據，請確認代碼或稍後再試!"
+    date = hist.index[-1].strftime('%Y-%m-%d')
+    price = '%.2f' % hist["Close"][-1]  # 近日收盤價
+    last_price = '%.2f' % hist["Close"][-2]  # 前一日收盤價
+    spread_price = '%.2f' % (float(price) - float(last_price))  # 價差
+    spread_ratio = '%.2f' % (float(spread_price) / float(last_price) * 100) + '%'  # 漲跌幅（百分比）
+    spread_price = spread_price.replace("-", "▽ ") if float(last_price) > float(price) else "△ " + spread_price
+    spread_ratio = spread_ratio.replace("-", "▽ ") if float(last_price) > float(price) else "△ " + spread_ratio
+    open_price = '%.2f' % hist["Open"][-1]  # 開盤價
+    high_price = '%.2f' % hist["High"][-1]  # 最高價
+    low_price = '%.2f' % hist["Low"][-1]  # 最低價
+    price_five = hist["Close"][-5:]  # 近五日收盤價
+    stockAverage = '%.2f' % price_five.mean()  # 近五日平均價格
+    stockSTD = '%.2f' % price_five.std()  # 近五日標準差
+    content += f"回報編號{stock_name}的股價{emoji_upinfo}\n--------------\n日期: {date}\n{emoji_midinfo}最新收盤價: {price}\n{emoji_midinfo}開盤價: {open_price}\n{emoji_midinfo}最高價: {high_price}\n{emoji_midinfo}最低價: {low_price}\n{emoji_midinfo}價差: {spread_price} 漲跌幅: {spread_ratio}\n{emoji_midinfo}近五日平均價格: {stockAverage}\n{emoji_midinfo}近五日標準差: {stockSTD}\n"
+    if msg.startswith("#"): content += f"--------------\n需要更詳細的資訊，可以點選以下選項進一步查詢唷{emoji_downinfo}"
+    else: 
+        content += '\n'
     return content
 
 # --------- 畫近一年股價走勢圖
