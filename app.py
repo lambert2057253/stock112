@@ -5,6 +5,7 @@ Copyright © 2020 Tsung Yu. All rights reserved.
 import re
 from pymongo import MongoClient
 import pymongo
+import os
 import urllib.parse
 import EXRate
 import news
