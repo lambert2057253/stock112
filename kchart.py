@@ -6,6 +6,7 @@ import mplfinance as mpf
 import requests
 from bs4 import BeautifulSoup
 import datetime
+import matplotlib.pyplot as plt 
 from matplotlib.font_manager import FontProperties
 import Imgur
 
@@ -41,9 +42,6 @@ def draw_kchart(stockNumber):
     if df.empty:
         return "無法獲取股票數據!"
 
-    # 保留原始 DatetimeIndex，不轉換為字串
-    # df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')  # 移除這一行
-    
     # 使用 pandas 計算均線
     df['sma_5'] = df['Close'].rolling(window=5).mean()
     df['sma_10'] = df['Close'].rolling(window=10).mean()
