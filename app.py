@@ -470,7 +470,10 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage(content))
         line_bot_api.push_message(uid, TextSendMessage('稍等一下, K線圖繪製中...'))
         k_imgurl = kchart.draw_kchart(stockNumber)
-        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=k_imgurl, preview_image_url=k_imgurl))
+        if k_imgurl.startswith("https"):
+            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=k_imgurl, preview_image_url=k_imgurl))
+        else:
+            line_bot_api.push_message(uid, TextSendMessage(k_imgurl))
         btn_msg = Msg_Template.stock_reply_other(stockNumber)
         line_bot_api.push_message(uid, btn_msg)
         return 0
