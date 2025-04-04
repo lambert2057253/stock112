@@ -11,7 +11,7 @@ def showImgur(fileName):
     client_secret = os.getenv('57e2995622d333a54c58f835421a09283346706d')
     album_id = os.getenv('a01322c5f22d4adf7b4bdd7c929d988497090d51')
     access_token = os.getenv('128009b544c3dfe5ca3d031128bc4b0aa35bbb5e')
-    refresh_token = os.getenv('A100E112stock')
+    refresh_token = os.getenv('stock')
 
     # 檢查憑證是否有效
     if not all([client_id, client_secret, access_token, refresh_token]):
