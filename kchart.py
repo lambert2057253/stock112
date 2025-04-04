@@ -6,14 +6,22 @@ import mplfinance as mpf
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import matplotlib.pyplot as plt 
+import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import Imgur
+import os
 
-# 設定中文字體
-chinese_font = FontProperties(fname='msjh.ttf')
-chinese_title = FontProperties(fname='msjh.ttf', size=24)
-chinese_subtitle = FontProperties(fname='msjh.ttf', size=20)
+# 確認字體檔案是否存在
+font_path = 'msjh.ttf'
+if not os.path.exists(font_path):
+    print(f"[log:ERROR] Font file {font_path} not found!")
+    chinese_font = FontProperties()  # 若檔案不存在，使用預設字體
+    chinese_title = FontProperties(size=24)
+    chinese_subtitle = FontProperties(size=20)
+else:
+    chinese_font = FontProperties(fname=font_path)
+    chinese_title = FontProperties(fname=font_path, size=24)
+    chinese_subtitle = FontProperties(fname=font_path, size=20)
 
 def get_stock_name(stockNumber):
     try:
@@ -42,13 +50,11 @@ def draw_kchart(stockNumber):
     if df.empty:
         return "無法獲取股票數據!"
 
-    # 使用 pandas 計算均線
     df['sma_5'] = df['Close'].rolling(window=5).mean()
     df['sma_10'] = df['Close'].rolling(window=10).mean()
     df['sma_20'] = df['Close'].rolling(window=20).mean()
     df['sma_60'] = df['Close'].rolling(window=60).mean()
 
-    # 設定圖表樣式
     apds = [
         mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
         mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
@@ -56,13 +62,11 @@ def draw_kchart(stockNumber):
         mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
     ]
 
-    # 繪製 K 線圖
     fig, axes = mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
         ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
     )
     
-    # 使用原始索引的最後一項
     last_date = df.index[-1].strftime('%Y-%m-%d')
     axes[0].set_title(
         f"開盤價: {df['Open'].iloc[-1]:.2f} 收盤價: {df['Close'].iloc[-1]:.2f}\n"
@@ -71,11 +75,9 @@ def draw_kchart(stockNumber):
         fontproperties=chinese_subtitle, loc='left', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65)
     )
     
-    # 保存並關閉圖表
     plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
     plt.close(fig)
 
-    # 上傳到 Imgur
     img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
         return "圖片上傳失敗，請稍後再試！"
