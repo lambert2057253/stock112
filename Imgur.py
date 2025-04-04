@@ -7,11 +7,11 @@ import datetime
 
 def showImgur(fileName):
     # 從環境變數獲取 Imgur 憑證
-    client_id = os.getenv('a96e89125fec0f2')
-    client_secret = os.getenv('57e2995622d333a54c58f835421a09283346706d')
-    album_id = os.getenv('ebff4c74408a2c944bbb450ef28d2340f990d2b4')
-    access_token = os.getenv('7c1328f8fd123327b955fb8d189e5fb62c4ba24d')
-    refresh_token = os.getenv('stock')
+    client_id = os.getenv('IMGUR_CLIENT_ID')
+    client_secret = os.getenv('IMGUR_CLIENT_SECRET')
+    album_id = os.getenv('IMGUR_ALBUM_ID')
+    access_token = os.getenv('IMGUR_ACCESS_TOKEN')
+    refresh_token = os.getenv('IMGUR_REFRESH_TOKEN')
 
     # 檢查憑證是否有效
     if not all([client_id, client_secret, access_token, refresh_token]):
