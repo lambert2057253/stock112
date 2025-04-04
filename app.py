@@ -29,9 +29,9 @@ from linebot.exceptions import (
     InvalidSignatureError
 )
 from linebot.models import (
-    MessageEvent, TextMessage, TextSendMessage,
+    MessageEvent, TextMessage, TextSendMessage,ImageSendMessage
 )
-from linebot.models import MessageEvent, TextMessage, TextSendMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage,ImageSendMessage
 
 app = Flask(__name__)
 
@@ -464,9 +464,9 @@ def handle_message(event):
         btn_msg = Msg_Template.stock_reply_other(stockNumber)
         line_bot_api.push_message(uid, btn_msg)
         return 0
-    elif re.match("K[0-9]{4}",msg):
+    elif re.match("K[0-9]{4}", msg):
         stockNumber = msg[1:]
-        content = Msg_Template.kchart_msg + "\n" +Msg_Template.kd_msg
+        content = Msg_Template.kchart_msg + "\n" + Msg_Template.kd_msg
         line_bot_api.push_message(uid, TextSendMessage(content))
         line_bot_api.push_message(uid, TextSendMessage('稍等一下, K線圖繪製中...'))
         k_imgurl = kchart.draw_kchart(stockNumber)
