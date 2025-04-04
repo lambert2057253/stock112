@@ -1,32 +1,23 @@
-# basic
+# kchart.py
 import numpy as np
 import pandas as pd
-import Imgur
-# get data
-import pandas_datareader as pdr
-
-# visual
-import matplotlib
-import matplotlib.pyplot as plt
-import mpl_finance as mpf
-import pandas_datareader as pdr
-# import seaborn as sns 
+import yfinance as yf  # 替換 pandas_datareader
+import mplfinance as mpf
+import requests
 from bs4 import BeautifulSoup
-#time
-import datetime as datetime
-
-#talib
+import datetime
 import talib
-import pandas as pd
-import requests,datetime
-from matplotlib.font_manager import FontProperties # 設定字體
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
-chinese_title = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=24) # 引入同個資料夾下支援中文字檔
-chinese_subtitle = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=20) # 引入同個資料夾下支援中文字檔
+from matplotlib.font_manager import FontProperties
+import os
+
+# 設定中文字體
+chinese_font = FontProperties(fname='msjh.ttf')
+chinese_title = FontProperties(fname='msjh.ttf', size=24)
+chinese_subtitle = FontProperties(fname='msjh.ttf', size=20)
 
 def get_stock_name(stockNumber):
     try:
-        url = 'https://tw.stock.yahoo.com/q/q?s=' + stockNumber
+        url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
         page = requests.get(url)
         soup = BeautifulSoup(page.content, 'html.parser')
         table = soup.find_all(text='成交')[0].parent.parent.parent
@@ -35,57 +26,57 @@ def get_stock_name(stockNumber):
     except:
         return "no"
 
-
 def draw_kchart(stockNumber):
     stock_name = get_stock_name(stockNumber)
-    if stock_name == "no": return "股票代碼錯誤!"
+    if stock_name == "no":
+        return "股票代碼錯誤!"
+    
     end = datetime.datetime.now()
-    date = end.strftime("%Y%m%d")
-    year = str(int(date[0:4]) - 1)
-    month = date[4:6]
-    stock = pdr.DataReader(stockNumber + '.TW', 'yahoo', start= year+"-"+month,end=end)
-    stock.index = stock.index.format(formatter=lambda x: x.strftime('%Y-%m-%d'))
-    #KD
-    sma_10 = talib.SMA(np.array(stock['Close']), 10)
-    sma_30 = talib.SMA(np.array(stock['Close']), 30)
-    stock['k'], stock['d'] = talib.STOCH(stock['High'], stock['Low'], stock['Close'])
-    stock['k'].fillna(value=0, inplace=True)
-    stock['d'].fillna(value=0, inplace=True)
-    sma_5 = talib.SMA(np.array(stock['Close']), 5)
-    sma_20 = talib.SMA(np.array(stock['Close']), 20)
-    sma_60 = talib.SMA(np.array(stock['Close']), 60)
-    fig = plt.figure(figsize=(20, 10))#,facecolor='black')
-    fig.suptitle(stock_name.strip('加到投資組合'),fontsize="x-large", FontProperties=chinese_title)
-    ax = fig.add_axes([0.1,0.5,0.75,0.4])
-    plt.title("開盤價:"+str(round(stock['Open'][-1], 2))+"  收盤價:"+str(round(stock['Close'][-1], 2))+"\n最高價:"+str(round(stock['High'][-1] ,2))+"  最低價:"+str(round(stock['Low'][-1], 2)),fontsize="25",fontweight='bold',bbox=dict(facecolor='yellow',edgecolor='red',alpha=0.65),loc='left', FontProperties=chinese_subtitle)
-    plt.title("更新日期:"+stock.index[-1],fontsize="20",fontweight='bold',loc="right", FontProperties=chinese_subtitle)
-    plt.grid(True,linestyle="--",color='gray',linewidth='0.5',axis='both')
+    start = end - datetime.timedelta(days=365)  # 近一年數據
+    stock = yf.Ticker(stockNumber + '.TW')
+    df = stock.history(start=start, end=end)
+    if df.empty:
+        return "無法獲取股票數據!"
 
-    ax2 = fig.add_axes([0.1,0.3,0.75,0.20])
-    plt.grid(True,linestyle="--",color='gray',linewidth='0.5',axis='both')
-    ax3 = fig.add_axes([0.1,0.03,0.75,0.20])
-    mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'],
-                      stock['Low'], width=0.6, colorup='r', colordown='g', alpha=0.75)
-    ax.plot(sma_5, label='5日均線')
-    ax.plot(sma_10, label='10日均線')
-    ax.plot(sma_20, label='20日均線')
-    ax.plot(sma_60, label='60日均線')
+    df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
+    
+    # 計算技術指標
+    sma_5 = talib.SMA(np.array(df['Close']), 5)
+    sma_10 = talib.SMA(np.array(df['Close']), 10)
+    sma_20 = talib.SMA(np.array(df['Close']), 20)
+    sma_60 = talib.SMA(np.array(df['Close']), 60)
+    df['k'], df['d'] = talib.STOCH(df['High'], df['Low'], df['Close'])
+    df['k'].fillna(value=0, inplace=True)
+    df['d'].fillna(value=0, inplace=True)
 
-    ax2.plot(stock['k'], label='K值')
-    ax2.plot(stock['d'], label='D值')
+    # 設定圖表樣式
+    apds = [
+        mpf.make_addplot(sma_5, color='blue', label='5日均線'),
+        mpf.make_addplot(sma_10, color='orange', label='10日均線'),
+        mpf.make_addplot(sma_20, color='green', label='20日均線'),
+        mpf.make_addplot(sma_60, color='purple', label='60日均線'),
+        mpf.make_addplot(df['k'], panel=1, color='red', label='K值'),
+        mpf.make_addplot(df['d'], panel=1, color='blue', label='D值'),
+    ]
 
-    ax2.set_xticks(range(0, len(stock.index),10))
-    ax2.set_xticklabels(stock.index[::10],fontsize="10", rotation=25)
+    # 繪製 K 線圖
+    fig, axes = mpf.plot(
+        df, type='candle', style='charles', title=f'{stock_name} K線圖',
+        ylabel='價格', volume=True, addplot=apds, panel_ratios=(1, 0.5, 0.5),
+        savefig='kchart.png', returnfig=True
+    )
+    
+    # 添加標題資訊
+    axes[0].set_title(
+        f"開盤價: {df['Open'].iloc[-1]:.2f} 收盤價: {df['Close'].iloc[-1]:.2f}\n"
+        f"最高價: {df['High'].iloc[-1]:.2f} 最低價: {df['Low'].iloc[-1]:.2f}\n"
+        f"更新日期: {df.index[-1]}",
+        fontproperties=chinese_subtitle, loc='left', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65)
+    )
+    
+    # 保存並關閉圖表
+    plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
+    plt.close(fig)
 
-    mpf.volume_overlay(ax3, stock['Open'], stock['Close'], stock['Volume'], colorup='r', colordown='g', width=0.5, alpha=0.8)
-    ax3.set_xticks(range(0, len(stock.index),10))
-    ax3.set_xticklabels(stock.index[::5],fontsize="10", rotation=45)
-
-    ax.legend(prop=chinese_font, fontsize=20);
-    ax2.legend(prop=chinese_font);
-    plt.grid(True,linestyle="--",color='gray',linewidth='0.5',axis='both')
-    plt.gcf()
-    plt.savefig("Kchrat.png",bbox_inches='tight',dpi=300,pad_inches=0.0)
-    plt.show()
-    plt.close()
-    return Imgur.showImgur("Kchrat")
+    # 上傳到 Imgur（需自行實現 Imgur 上傳邏輯）
+    return Imgur.showImgur("kchart")  # 假設 Imgur.showImgur 已定義
