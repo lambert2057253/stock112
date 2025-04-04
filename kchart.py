@@ -49,7 +49,11 @@ def draw_kchart(stockNumber):
     stock = yf.Ticker(stockNumber + '.TW')
     df = stock.history(start=start, end=end)
     if df.empty:
+        print(f"[log:ERROR] No data returned for {stockNumber}.TW")
         return "無法獲取股票數據!"
+    
+    print(f"[log:DEBUG] Data shape: {df.shape}")
+    print(f"[log:DEBUG] Data sample: \n{df.tail(5)}")
 
     df['sma_5'] = df['Close'].rolling(window=5).mean()
     df['sma_10'] = df['Close'].rolling(window=10).mean()
@@ -63,6 +67,7 @@ def draw_kchart(stockNumber):
         mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
     ]
 
+    print("[log:INFO] Starting chart generation")
     fig, axes = mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
         ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
@@ -76,10 +81,17 @@ def draw_kchart(stockNumber):
         fontproperties=chinese_subtitle, loc='left', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65)
     )
     
+    print("[log:INFO] Saving chart to kchart.png")
     plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
     plt.close(fig)
 
+    if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
+        print("[log:ERROR] kchart.png is empty or not created!")
+        return "圖表生成失敗，請稍後再試！"
+
     img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
+        print(f"[log:ERROR] Imgur upload failed: {img_url}")
         return "圖片上傳失敗，請稍後再試！"
+    print(f"[log:INFO] Chart uploaded: {img_url}")
     return img_url
