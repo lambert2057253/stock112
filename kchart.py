@@ -7,22 +7,8 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
 import Imgur
 import os
-
-# 固定字體路徑
-font_path = '/opt/render/project/src/msjh.ttf'
-if not os.path.exists(font_path):
-    print(f"[log:ERROR] Font file {font_path} not found! Using default font.")
-    chinese_font = FontProperties()
-    chinese_title = FontProperties(size=24)
-    chinese_subtitle = FontProperties(size=20)
-else:
-    print(f"[log:INFO] Font file {font_path} found.")
-    chinese_font = FontProperties(fname=font_path)
-    chinese_title = FontProperties(fname=font_path, size=24)
-    chinese_subtitle = FontProperties(fname=font_path, size=20)
 
 def get_stock_name(stockNumber):
     try:
@@ -42,7 +28,7 @@ def get_stock_name(stockNumber):
 def draw_kchart(stockNumber):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
-        return "股票代碼錯誤!"
+        return "Invalid stock code!"
     
     end = datetime.datetime.now()
     start = end - datetime.timedelta(days=365)
@@ -50,25 +36,25 @@ def draw_kchart(stockNumber):
     df = stock.history(start=start, end=end)
     if df.empty:
         print(f"[log:ERROR] No data returned for {stockNumber}.TW")
-        return "無法獲取股票數據!"
+        return "No stock data available!"
     
     print(f"[log:DEBUG] Data shape: {df.shape}")
     print(f"[log:DEBUG] Data sample: \n{df.tail(5)}")
 
     print("[log:INFO] Starting chart generation")
     mpf.plot(
-        df, type='candle', style='charles', title=f'{stock_name} K線圖',
-        ylabel='價格', volume=True, mav=(5, 10, 20, 60), savefig='kchart.png'
+        df, type='candle', style='charles', title=f'{stock_name} Candlestick Chart',
+        ylabel='Price', volume=True, mav=(5, 10, 20, 60), savefig='kchart.png'
     )
     
     if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
         print("[log:ERROR] kchart.png is empty or not created!")
-        return "圖表生成失敗，請稍後再試！"
+        return "Chart generation failed, please try again later!"
     
     print("[log:INFO] Chart saved to kchart.png")
     img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
         print(f"[log:ERROR] Imgur upload failed: {img_url}")
-        return "圖片上傳失敗，請稍後再試！"
+        return "Image upload failed, please try again later!"
     print(f"[log:INFO] Chart uploaded: {img_url}")
     return img_url
