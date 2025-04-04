@@ -11,8 +11,8 @@ from matplotlib.font_manager import FontProperties
 import Imgur
 import os
 
-# 動態生成字體路徑
-font_path = os.path.join(os.path.dirname(__file__), 'msjh.ttf')
+# 固定字體路徑
+font_path = '/opt/render/project/src/msjh.ttf'
 if not os.path.exists(font_path):
     print(f"[log:ERROR] Font file {font_path} not found! Using default font.")
     chinese_font = FontProperties()
@@ -55,7 +55,6 @@ def draw_kchart(stockNumber):
     print(f"[log:DEBUG] Data shape: {df.shape}")
     print(f"[log:DEBUG] Data sample: \n{df.tail(5)}")
 
-    # 繪製圖表
     print("[log:INFO] Starting chart generation")
     mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
