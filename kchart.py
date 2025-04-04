@@ -55,40 +55,18 @@ def draw_kchart(stockNumber):
     print(f"[log:DEBUG] Data shape: {df.shape}")
     print(f"[log:DEBUG] Data sample: \n{df.tail(5)}")
 
-    df['sma_5'] = df['Close'].rolling(window=5).mean()
-    df['sma_10'] = df['Close'].rolling(window=10).mean()
-    df['sma_20'] = df['Close'].rolling(window=20).mean()
-    df['sma_60'] = df['Close'].rolling(window=60).mean()
-
-    apds = [
-        mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
-        mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
-        mpf.make_addplot(df['sma_20'], color='green', label='20日均線'),
-        mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
-    ]
-
+    # 繪製圖表
     print("[log:INFO] Starting chart generation")
-    fig, axes = mpf.plot(
+    mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
-        ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
+        ylabel='價格', volume=True, mav=(5, 10, 20, 60), savefig='kchart.png'
     )
     
-    last_date = df.index[-1].strftime('%Y-%m-%d')
-    axes[0].set_title(
-        f"開盤價: {df['Open'].iloc[-1]:.2f} 收盤價: {df['Close'].iloc[-1]:.2f}\n"
-        f"最高價: {df['High'].iloc[-1]:.2f} 最低價: {df['Low'].iloc[-1]:.2f}\n"
-        f"更新日期: {last_date}",
-        fontproperties=chinese_subtitle, loc='left', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65)
-    )
-    
-    print("[log:INFO] Saving chart to kchart.png")
-    plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
-    plt.close(fig)
-
     if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
         print("[log:ERROR] kchart.png is empty or not created!")
         return "圖表生成失敗，請稍後再試！"
-
+    
+    print("[log:INFO] Chart saved to kchart.png")
     img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
         print(f"[log:ERROR] Imgur upload failed: {img_url}")
