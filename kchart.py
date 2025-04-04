@@ -45,7 +45,7 @@ def draw_kchart(stockNumber):
     df['sma_20'] = df['Close'].rolling(window=20).mean()
     df['sma_60'] = df['Close'].rolling(window=60).mean()
 
-    # 設定圖表樣式（移除 KD 指標）
+    # 設定圖表樣式
     apds = [
         mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
         mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
@@ -59,7 +59,6 @@ def draw_kchart(stockNumber):
         ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
     )
     
-    # 添加標題資訊
     axes[0].set_title(
         f"開盤價: {df['Open'].iloc[-1]:.2f} 收盤價: {df['Close'].iloc[-1]:.2f}\n"
         f"最高價: {df['High'].iloc[-1]:.2f} 最低價: {df['Low'].iloc[-1]:.2f}\n"
@@ -72,4 +71,7 @@ def draw_kchart(stockNumber):
     plt.close(fig)
 
     # 上傳到 Imgur
-    return Imgur.showImgur("kchart")
+    img_url = Imgur.showImgur("kchart")
+    if not img_url.startswith("https"):
+        return "圖片上傳失敗，請稍後再試！"
+    return img_url
