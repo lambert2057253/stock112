@@ -6,11 +6,11 @@ import mplfinance as mpf
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import talib
+import pandas_ta as ta  # 替換 talib
 from matplotlib.font_manager import FontProperties
-import Imgur  # 導入 Imgur 模組
+import Imgur
 
-# 設定中文字體（假設 msjh.ttf 已上傳至專案目錄）
+# 設定中文字體
 chinese_font = FontProperties(fname='msjh.ttf')
 chinese_title = FontProperties(fname='msjh.ttf', size=24)
 chinese_subtitle = FontProperties(fname='msjh.ttf', size=20)
@@ -32,7 +32,7 @@ def draw_kchart(stockNumber):
         return "股票代碼錯誤!"
     
     end = datetime.datetime.now()
-    start = end - datetime.timedelta(days=365)  # 近一年數據
+    start = end - datetime.timedelta(days=365)
     stock = yf.Ticker(stockNumber + '.TW')
     df = stock.history(start=start, end=end)
     if df.empty:
@@ -40,21 +40,23 @@ def draw_kchart(stockNumber):
 
     df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
     
-    # 計算技術指標
-    sma_5 = talib.SMA(np.array(df['Close']), 5)
-    sma_10 = talib.SMA(np.array(df['Close']), 10)
-    sma_20 = talib.SMA(np.array(df['Close']), 20)
-    sma_60 = talib.SMA(np.array(df['Close']), 60)
-    df['k'], df['d'] = talib.STOCH(df['High'], df['Low'], df['Close'])
+    # 使用 pandas-ta 計算技術指標
+    df['sma_5'] = ta.sma(df['Close'], length=5)
+    df['sma_10'] = ta.sma(df['Close'], length=10)
+    df['sma_20'] = ta.sma(df['Close'], length=20)
+    df['sma_60'] = ta.sma(df['Close'], length=60)
+    stoch = ta.stoch(df['High'], df['Low'], df['Close'])
+    df['k'] = stoch['STOCHk_9_3_3']
+    df['d'] = stoch['STOCHd_9_3_3']
     df['k'].fillna(value=0, inplace=True)
     df['d'].fillna(value=0, inplace=True)
 
     # 設定圖表樣式
     apds = [
-        mpf.make_addplot(sma_5, color='blue', label='5日均線'),
-        mpf.make_addplot(sma_10, color='orange', label='10日均線'),
-        mpf.make_addplot(sma_20, color='green', label='20日均線'),
-        mpf.make_addplot(sma_60, color='purple', label='60日均線'),
+        mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
+        mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
+        mpf.make_addplot(df['sma_20'], color='green', label='20日均線'),
+        mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
         mpf.make_addplot(df['k'], panel=1, color='red', label='K值'),
         mpf.make_addplot(df['d'], panel=1, color='blue', label='D值'),
     ]
