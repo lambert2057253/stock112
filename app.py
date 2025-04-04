@@ -8,6 +8,7 @@ import pymongo
 import os
 import urllib.parse
 import EXRate
+import kchart
 import news
 import stockprice
 import Institutional_Investors
