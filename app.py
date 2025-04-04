@@ -432,7 +432,7 @@ def handle_message(event):
         return 0
     elif re.match('F[0-9]', msg):
         stockNumber = msg[1:]
-        line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 將給您編號: {tockNumber}三大法人買賣資訊...'))
+        line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 將給您編號: {stockNumber}三大法人買賣資訊...'))
         content = Institutional_Investors.institutional_investors(stockNumber)
         line_bot_api.push_message(uid, TextSendMessage(content))
         btn_msg = Msg_Template.stock_reply_other(stockNumber)
