@@ -23,6 +23,8 @@ yfinance>=0.2.37         # 獲取 Yahoo Finance 股票數據
 twder==0.2.2             # 取得台灣匯率數據
 matplotlib>=3.8.3        # 繪圖函式庫，用於數據視覺化
 setuptools
+mplfinance
+talib-binary
 
 # 時間與排程
 schedule>=1.2.1          # 任務排程工具，可用於定時執行特定函數
