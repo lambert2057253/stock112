@@ -1,16 +1,16 @@
 # kchart.py
 import numpy as np
 import pandas as pd
-import yfinance as yf  # 替換 pandas_datareader
+import yfinance as yf
 import mplfinance as mpf
 import requests
 from bs4 import BeautifulSoup
 import datetime
 import talib
 from matplotlib.font_manager import FontProperties
-import os
+import Imgur  # 導入 Imgur 模組
 
-# 設定中文字體
+# 設定中文字體（假設 msjh.ttf 已上傳至專案目錄）
 chinese_font = FontProperties(fname='msjh.ttf')
 chinese_title = FontProperties(fname='msjh.ttf', size=24)
 chinese_subtitle = FontProperties(fname='msjh.ttf', size=20)
@@ -78,5 +78,5 @@ def draw_kchart(stockNumber):
     plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
     plt.close(fig)
 
-    # 上傳到 Imgur（需自行實現 Imgur 上傳邏輯）
-    return Imgur.showImgur("kchart")  # 假設 Imgur.showImgur 已定義
+    # 上傳到 Imgur
+    return Imgur.showImgur("kchart")
