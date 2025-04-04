@@ -2,37 +2,37 @@
 Upload pics
 '''
 import matplotlib
-matplotlib.use('Agg')
-import datetime
+matplotlib.use('Agg')  # 確保非 GUI 環境下運行
 from imgurpython import ImgurClient
-client_id = 'Your imgur client id'
-client_secret = 'Your imgur client secret'
-album_id = 'Your imgur album id'
-access_token = 'Your imgur access token'
-refresh_token = 'Your imgur refresh token'
+import os
+import datetime
 
 def showImgur(fileName):
-        # connect imgur
-        client= ImgurClient(client_id, client_secret, access_token, refresh_token)
+    # 從環境變數獲取 Imgur 憑證
+    client_id = os.getenv('IMGUR_CLIENT_ID')
+    client_secret = os.getenv('IMGUR_CLIENT_SECRET')
+    album_id = os.getenv('IMGUR_ALBUM_ID')
+    access_token = os.getenv('IMGUR_ACCESS_TOKEN')
+    refresh_token = os.getenv('IMGUR_REFRESH_TOKEN')
+
+    # 連接到 Imgur
+    client = ImgurClient(client_id, client_secret, access_token, refresh_token)
     
-        # params
-        config = {
-            'album': album_id, # album name
-            'name': fileName, # pics name
-            'title': fileName, # pics title
-            'description': str(datetime.date.today())
-            }
-        
-        # Upload file
-        try:
-            print("[log:INFO]Uploading image... ")
-            imgurl = client.upload_from_path(fileName+'.png', config=config, anon=False)['link']
-            #string to dict
-            print("[log:INFO]Done upload. ")
-        except :
-            # if faild to upload
-            imgurl = 'https://i.imgur.com/RFmkvQX.jpg'
-            print("[log:ERROR]Unable upload ! ")
-            
-        
-        return imgurl
+    # 配置參數
+    config = {
+        'album': album_id,
+        'name': fileName,
+        'title': fileName,
+        'description': str(datetime.date.today())
+    }
+    
+    # 上傳檔案
+    try:
+        print(f"[log:INFO] Uploading image: {fileName}.png")
+        imgurl = client.upload_from_path(f"{fileName}.png", config=config, anon=False)['link']
+        print("[log:INFO] Done upload.")
+    except Exception as e:
+        print(f"[log:ERROR] Unable to upload: {e}")
+        imgurl = 'https://i.imgur.com/RFmkvQX.jpg'  # 預設錯誤圖片
+    
+    return imgurl
