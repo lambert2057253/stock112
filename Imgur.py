@@ -9,8 +9,8 @@ def showImgur(fileName):
     # 從環境變數獲取 Imgur 憑證
     client_id = os.getenv('a96e89125fec0f2')
     client_secret = os.getenv('57e2995622d333a54c58f835421a09283346706d')
-    album_id = os.getenv('a01322c5f22d4adf7b4bdd7c929d988497090d51')
-    access_token = os.getenv('128009b544c3dfe5ca3d031128bc4b0aa35bbb5e')
+    album_id = os.getenv('ebff4c74408a2c944bbb450ef28d2340f990d2b4')
+    access_token = os.getenv('7c1328f8fd123327b955fb8d189e5fb62c4ba24d')
     refresh_token = os.getenv('stock')
 
     # 檢查憑證是否有效
