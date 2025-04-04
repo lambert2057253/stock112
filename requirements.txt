@@ -24,7 +24,6 @@ twder             # 取得台灣匯率數據
 matplotlib        # 繪圖函式庫，用於數據視覺化
 setuptools
 mplfinance
-pandas-ta
 
 # 時間與排程
 schedule          # 任務排程工具，可用於定時執行特定函數
