@@ -16,10 +16,10 @@ chinese_subtitle = FontProperties(fname='msjh.ttf', size=20)
 
 def get_stock_name(stockNumber):
     try:
-        url = f'https://tw.stock.yahoo.com/quote/{stockNumber}.TW'  # 使用更穩定的 quote 頁面
+        url = f'https://tw.stock.yahoo.com/quote/{stockNumber}.TW'
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         page = requests.get(url, headers=headers)
-        page.raise_for_status()  # 檢查請求是否成功
+        page.raise_for_status()
         soup = BeautifulSoup(page.content, 'html.parser')
         stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)')
         if stock_name:
@@ -41,13 +41,16 @@ def draw_kchart(stockNumber):
     if df.empty:
         return "無法獲取股票數據!"
 
-    df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
+    # 保留原始 DatetimeIndex，不轉換為字串
+    # df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')  # 移除這一行
     
+    # 使用 pandas 計算均線
     df['sma_5'] = df['Close'].rolling(window=5).mean()
     df['sma_10'] = df['Close'].rolling(window=10).mean()
     df['sma_20'] = df['Close'].rolling(window=20).mean()
     df['sma_60'] = df['Close'].rolling(window=60).mean()
 
+    # 設定圖表樣式
     apds = [
         mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
         mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
@@ -55,21 +58,26 @@ def draw_kchart(stockNumber):
         mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
     ]
 
+    # 繪製 K 線圖
     fig, axes = mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
         ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
     )
     
+    # 使用原始索引的最後一項
+    last_date = df.index[-1].strftime('%Y-%m-%d')
     axes[0].set_title(
         f"開盤價: {df['Open'].iloc[-1]:.2f} 收盤價: {df['Close'].iloc[-1]:.2f}\n"
         f"最高價: {df['High'].iloc[-1]:.2f} 最低價: {df['Low'].iloc[-1]:.2f}\n"
-        f"更新日期: {df.index[-1]}",
+        f"更新日期: {last_date}",
         fontproperties=chinese_subtitle, loc='left', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65)
     )
     
+    # 保存並關閉圖表
     plt.savefig('kchart.png', bbox_inches='tight', dpi=300, pad_inches=0.0)
     plt.close(fig)
 
+    # 上傳到 Imgur
     img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
         return "圖片上傳失敗，請稍後再試！"
