@@ -6,7 +6,6 @@ import mplfinance as mpf
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import pandas_ta as ta  # 替換 talib
 from matplotlib.font_manager import FontProperties
 import Imgur
 
@@ -40,32 +39,24 @@ def draw_kchart(stockNumber):
 
     df.index = pd.to_datetime(df.index).strftime('%Y-%m-%d')
     
-    # 使用 pandas-ta 計算技術指標
-    df['sma_5'] = ta.sma(df['Close'], length=5)
-    df['sma_10'] = ta.sma(df['Close'], length=10)
-    df['sma_20'] = ta.sma(df['Close'], length=20)
-    df['sma_60'] = ta.sma(df['Close'], length=60)
-    stoch = ta.stoch(df['High'], df['Low'], df['Close'])
-    df['k'] = stoch['STOCHk_9_3_3']
-    df['d'] = stoch['STOCHd_9_3_3']
-    df['k'].fillna(value=0, inplace=True)
-    df['d'].fillna(value=0, inplace=True)
+    # 使用 pandas 計算均線
+    df['sma_5'] = df['Close'].rolling(window=5).mean()
+    df['sma_10'] = df['Close'].rolling(window=10).mean()
+    df['sma_20'] = df['Close'].rolling(window=20).mean()
+    df['sma_60'] = df['Close'].rolling(window=60).mean()
 
-    # 設定圖表樣式
+    # 設定圖表樣式（移除 KD 指標）
     apds = [
         mpf.make_addplot(df['sma_5'], color='blue', label='5日均線'),
         mpf.make_addplot(df['sma_10'], color='orange', label='10日均線'),
         mpf.make_addplot(df['sma_20'], color='green', label='20日均線'),
         mpf.make_addplot(df['sma_60'], color='purple', label='60日均線'),
-        mpf.make_addplot(df['k'], panel=1, color='red', label='K值'),
-        mpf.make_addplot(df['d'], panel=1, color='blue', label='D值'),
     ]
 
     # 繪製 K 線圖
     fig, axes = mpf.plot(
         df, type='candle', style='charles', title=f'{stock_name} K線圖',
-        ylabel='價格', volume=True, addplot=apds, panel_ratios=(1, 0.5, 0.5),
-        savefig='kchart.png', returnfig=True
+        ylabel='價格', volume=True, addplot=apds, savefig='kchart.png', returnfig=True
     )
     
     # 添加標題資訊
