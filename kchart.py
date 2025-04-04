@@ -11,17 +11,9 @@ from matplotlib.font_manager import FontProperties
 import Imgur
 import os
 
-# 確認字體檔案是否存在
-font_path = 'msjh.ttf'
-if not os.path.exists(font_path):
-    print(f"[log:ERROR] Font file {font_path} not found!")
-    chinese_font = FontProperties()  # 若檔案不存在，使用預設字體
-    chinese_title = FontProperties(size=24)
-    chinese_subtitle = FontProperties(size=20)
-else:
-    chinese_font = FontProperties(fname=font_path)
-    chinese_title = FontProperties(fname=font_path, size=24)
-    chinese_subtitle = FontProperties(fname=font_path, size=20)
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
+chinese_title = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=24) # 引入同個資料夾下支援中文字檔
+chinese_subtitle = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=20) # 引入同個資料夾下支援中文字檔
 
 def get_stock_name(stockNumber):
     try:
