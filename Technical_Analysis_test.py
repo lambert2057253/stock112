@@ -4,8 +4,6 @@ from pandas_datareader import data
 import yfinance as yf # yahoo專用的拿來拉股票資訊
 import datetime
 import talib #技術分析專用
-# from talib import *
-# from talib import abstract
 import mpl_finance as mpf # 專門用來畫蠟燭圖的
 import matplotlib.pyplot as plt # 繪圖專用
 import Imgur
