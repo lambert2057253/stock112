@@ -16,14 +16,14 @@ html5lib
 selenium
 
 # 數據處理與分析
-numpy==1.22.4
-pandas==1.5.3
+numpy==1.26.4  # 支援 Python 3.11
+pandas==2.2.2  # 支援 Python 3.11
 pandas_datareader
 yfinance==0.2.40
 twder
 matplotlib
 mplfinance==0.12.9b7
-talib-binary  
+ta-lib==0.4.32 
 
 # 時間與排程
 schedule
