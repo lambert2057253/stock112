@@ -23,7 +23,7 @@ yfinance==0.2.40
 twder
 matplotlib
 mplfinance==0.12.9b7
-ta-lib==0.4.32 
+setuptools
 
 # 時間與排程
 schedule
