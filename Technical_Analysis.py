@@ -2,9 +2,6 @@
 import pandas as pd
 import matplotlib
 matplotlib.use('Agg')
-import talib
-from talib import abstract
-import Imgur
 import matplotlib.pyplot as plt
 import pandas_datareader as pdr
 import requests
@@ -41,7 +38,20 @@ def MACD_pic(stockNumber, msg):
     stock_name = get_stockName(stockNumber)
     df_x = general_df(stockNumber)
     jj = df_x.reset_index(drop=False)
-    abstract.MACD(df_x).plot(figsize=(16, 8))
+    
+    # 手動計算 MACD
+    ema12 = df_x['close'].ewm(span=12, adjust=False).mean()
+    ema26 = df_x['close'].ewm(span=26, adjust=False).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9, adjust=False).mean()
+    macd_hist = macd - signal
+    macd_df = pd.DataFrame({
+        'MACD': macd,
+        'MACD Signal': signal,
+        'MACD Hist': macd_hist
+    }, index=df_x.index)
+    
+    macd_df.plot(figsize=(16, 8))
     plt.xlabel("日期", fontproperties=chinese_font)
     plt.ylabel("值", fontproperties=chinese_font)
     plt.grid(True, axis='y')
@@ -54,7 +64,16 @@ def RSI_pic(stockNumber, msg):
     stock_name = get_stockName(stockNumber)
     df_x = general_df(stockNumber)
     jj = df_x.reset_index(drop=False)
-    abstract.RSI(df_x).plot(figsize=(16, 8))
+    
+    # 手動計算 RSI
+    delta = df_x['close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    rsi_df = pd.DataFrame({'RSI': rsi}, index=df_x.index)
+    
+    rsi_df.plot(figsize=(16, 8))
     plt.xlabel("日期", fontproperties=chinese_font)
     plt.ylabel("KD值", fontproperties=chinese_font)
     plt.grid(True, axis='y')
@@ -67,7 +86,19 @@ def BBANDS_pic(stockNumber, msg):
     stock_name = get_stockName(stockNumber)
     df_x = general_df(stockNumber)
     jj = df_x.reset_index(drop=False)
-    abstract.BBANDS(df_x).plot(figsize=(16, 8))
+    
+    # 手動計算 BBANDS
+    sma = df_x['close'].rolling(window=20).mean()
+    std = df_x['close'].rolling(window=20).std()
+    upper_band = sma + (std * 2)
+    lower_band = sma - (std * 2)
+    bbands_df = pd.DataFrame({
+        'Upper Band': upper_band,
+        'Middle Band': sma,
+        'Lower Band': lower_band
+    }, index=df_x.index)
+    
+    bbands_df.plot(figsize=(16, 8))
     plt.xlabel("日期", fontproperties=chinese_font)
     plt.ylabel("價格", fontproperties=chinese_font)
     plt.grid(True, axis='y')
