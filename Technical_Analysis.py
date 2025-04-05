@@ -4,6 +4,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import pandas_datareader as pdr
+import yfinance as yf
 import requests
 import datetime
 from bs4 import BeautifulSoup
@@ -26,13 +27,31 @@ def general_df(stockNumber):
     return df_x
 
 def get_stockName(stockNumber):
-    url = 'https://tw.stock.yahoo.com/q/q?s=' + stockNumber
-    page = requests.get(url)
-    soup = BeautifulSoup(page.content, 'html.parser')
-    table = soup.find_all(text='成交')[0].parent.parent.parent
-    stock_name = table.select('tr')[1].select('td')[0].text
-    stock_name = stock_name.strip('加到投資組合')
-    return stock_name
+    try:
+        # 使用 yfinance 獲取股票名稱
+        stock = yf.Ticker(stockNumber + '.TW')
+        info = stock.info
+        stock_name = info.get('longName', stockNumber)  # 若無名稱，返回代碼
+        return stock_name
+    except Exception as e:
+        print(f"[log:ERROR] Failed to get stock name from yfinance: {e}")
+        # 備用方法：從網頁獲取
+        try:
+            url = f'https://tw.stock.yahoo.com/q/q?s={stockNumber}'
+            headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+            page = requests.get(url, headers=headers)
+            soup = BeautifulSoup(page.content, 'html.parser')
+            table = soup.find_all(text='成交')[0].parent.parent.parent
+            trs = table.select('tr')
+            if len(trs) > 1:
+                stock_name = trs[1].select('td')[0].text.strip('加到投資組合')
+                return stock_name
+            else:
+                print(f"[log:ERROR] Table structure invalid for {stockNumber}")
+                return stockNumber  # 若無法解析，返回代碼
+        except Exception as e:
+            print(f"[log:ERROR] Failed to get stock name from web: {e}")
+            return stockNumber  # 最終備用，返回代碼
 
 def MACD_pic(stockNumber, msg):
     stock_name = get_stockName(stockNumber)
