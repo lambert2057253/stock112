@@ -591,11 +591,11 @@ def handle_message(event):
         line_bot_api.push_message(uid, TextSendMessage("我們將給您最新的周回顧"))
         line_bot_api.push_message(uid, Msg_News.weekly_finance_news())
         return 0
-    elif re.match('N[0-9]{4}', msg): # 新聞
+    elif re.match('N[0-9]{4}', msg):
         stockNumber = msg[1:]
         line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 將給您編號: {stockNumber} 的新聞資訊...'))
         content = Msg_News.single_stock(stockNumber)
-        line_bot_api.push_message(uid, TextSendMessage(content))
+        line_bot_api.push_message(uid, content) 
         btn_msg = Msg_Template.stock_reply_other(stockNumber)
         line_bot_api.push_message(uid, btn_msg)
         return 0
