@@ -1,7 +1,7 @@
 ''' 
 三大法人買賣超
 '''
-#繪圖用
+# 繪圖用
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -10,13 +10,13 @@ import datetime
 from bs4 import BeautifulSoup
 from io import StringIO
 import pandas as pd
-from matplotlib.font_manager import FontProperties # 設定字體
+from matplotlib.font_manager import FontProperties
 import Imgur
 import time
-# from matplotlib.ticker import FuncFormatter
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
-chinese_title = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=24) 
-chinese_subtitle = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=20) 
+
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf')
+chinese_title = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=24)
+chinese_subtitle = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=20)
 
 def get_stock_name(stockNumber):
     try:
@@ -29,45 +29,45 @@ def get_stock_name(stockNumber):
     except:
         return "no"
 
-
 # 畫出籌碼面圖
 def institutional_investors_pic(stockNumber):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no": return "股票代碼錯誤!"
-    mn=pd.read_html(f'https://www.cnyes.com/twstock/Institutional/{stockNumber}.htm')
-    st=pd.read_html(f'https://www.cnyes.com/twstock/ps_historyprice/{stockNumber}.htm')
-    mn=mn[0]
-    #fig=plt.figure(24,20)
-    rg=len(mn['合計'])-1
-    st= st[0]["收盤"][0:rg+1]
-    st_hist=list(st)
+    mn = pd.read_html(f'https://www.cnyes.com/twstock/Institutional/{stockNumber}.htm')
+    st = pd.read_html(f'https://www.cnyes.com/twstock/ps_historyprice/{stockNumber}.htm')
+    mn = mn[0]
+    rg = len(mn['合計']) - 1
+    st = st[0]["收盤"][0:rg+1]
+    st_hist = list(st)
     st_hist.reverse()
-    mm_hist= list(mn['合計'])
+    mm_hist = list(mn['合計'])
     mm_hist.reverse()
-    mm_dt=list(mn['日期'])
+    mm_dt = list(mn['日期'])
     mm_dt.reverse()
-    fig,ax1 = plt.subplots(figsize=(16, 7))
+    fig, ax1 = plt.subplots(figsize=(16, 7))
     plt.title(stock_name + " 三大法人買賣超", FontProperties=chinese_title)
-    ax1.bar(mm_dt,mm_hist,0.4,alpha=0.8)
+    ax1.bar(mm_dt, mm_hist, 0.4, alpha=0.8)
     ax1.set_ylabel("張", FontProperties=chinese_subtitle, rotation=360)
-    plt.grid(True,linestyle="--",color='gray',linewidth='0.5',axis='both')
-    ax2=ax1.twinx()
-    ax2.plot(st_hist,color='r',linewidth='2.5')
+    plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
+    ax2 = ax1.twinx()
+    ax2.plot(st_hist, color='r', linewidth='2.5')
     ax2.set_ylabel('股價(元)', FontProperties=chinese_subtitle)
-    plt.grid(True,linestyle="--",color='gray',linewidth='0.5',axis='both')
+    plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
     plt.legend(prop=chinese_subtitle)
     plt.savefig("法人.png")
-    plt.show()
     plt.close()
     return Imgur.showImgur("法人")
+
 # 三大法人買賣超(純文字敘述)
 def institutional_investors(stockNumber):
     time.sleep(2)
-    # today=datetime.date.today()
-    # date=today.strftime('20%y%m%d') #date = '20191108'
     r = requests.get('https://www.twse.com.tw/fund/T86?response=csv&date&selectType=ALLBUT0999')
+    if r.status_code != 200:
+        print(f"[log:ERROR] Failed to fetch TWSE data: {r.status_code}")
+        return "無法獲取三大法人數據，請稍後再試！"
+    
     df = pd.read_csv(StringIO(r.text), header=1).dropna(how='all', axis=1).dropna(how='any')
-    columns = len(df["證券代號"])-1
+    columns = len(df["證券代號"]) - 1
     for i in range(columns):
         stockCode = df["證券代號"][i]
         if stockCode == stockNumber:
@@ -85,3 +85,7 @@ def institutional_investors(stockNumber):
             content += "自營商買賣超張數(避險): " + str(round(int(df["自營商買賣超股數(避險)"][i].replace(',',''))/1000))+"張\n\n"
             content += "三大法人買賣超張數:" + str(round(int(df["三大法人買賣超股數"][i].replace(',',''))/1000))+"張\n"
             return content
+    
+    # 若未找到匹配的股票代碼，返回預設訊息
+    print(f"[log:WARNING] Stock {stockNumber} not found in TWSE data")
+    return "找不到該股票的三大法人買賣資訊，請確認代碼！"
