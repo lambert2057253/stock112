@@ -78,7 +78,6 @@ def stock_KD(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('KD') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('KD.png') #存檔
         plt.close() # 刪除記憶體中的圖片
         return Imgur.showImgur('KD') 
@@ -102,7 +101,6 @@ def stock_MA(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Moving_Average') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Moving_Average.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Moving_Average') 
@@ -126,7 +124,6 @@ def stock_MACD(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('MACD') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('MACD.png') #存檔
         plt.close() # 刪除記憶體中的圖片
         return Imgur.showImgur('MACD') 
@@ -147,7 +144,6 @@ def stock_OBV(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('On_Balance_Volume') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('On_Balance_Volume.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('On_Balance_Volume') 
@@ -167,7 +163,6 @@ def stock_William(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Williams_Overbought') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Williams_Overbought.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Williams_Overbought') 
@@ -187,7 +182,6 @@ def stock_ATR(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Average_True_Range') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Average_True_Range.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Average_True_Range') 
@@ -207,7 +201,6 @@ def stock_ADX(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Average_Directional_Indicator') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Average_Directional_Indicator.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Average_Directional_Indicator') 
@@ -228,7 +221,6 @@ def stock_RSI(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title(userstock + 'RSI') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Relative_Strength_Index.png') #存檔
         plt.close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Relative_Strength_Index') 
@@ -248,7 +240,6 @@ def stock_MFI(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Money_Flow_Index') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Money_Flow_Index.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Money_Flow_Index') 
@@ -267,7 +258,6 @@ def stock_ROC(userstock):
         ret['Close'].plot(secondary_y=True,color=color[5])
         plt.title('Receiver_Operating_Characteristic_Curve') # 標題設定
         plt.grid(True,axis='y')
-        plt.show()
         plt.savefig('Receiver_Operating_Characteristic_Curve.png') #存檔
         plt. close() # 刪除記憶體中的圖片
         return Imgur.showImgur('Receiver_Operating_Characteristic_Curve') 
