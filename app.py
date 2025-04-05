@@ -13,6 +13,7 @@ import news
 import stockprice
 import Institutional_Investors
 import stock_compare
+import Technical_Analysis
 from msg_template import Msg_fundamental_ability
 from msg_template import Msg_Template
 from msg_template import questionnaire
