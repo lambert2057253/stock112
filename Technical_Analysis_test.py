@@ -1,263 +1,293 @@
+# Technical_Analysis_test.py
 import pandas as pd
 pd.core.common.is_list_like = pd.api.types.is_list_like
 from pandas_datareader import data
-import yfinance as yf # yahoo專用的拿來拉股票資訊
+import yfinance as yf
 import datetime
-import talib #技術分析專用
-import mpl_finance as mpf # 專門用來畫蠟燭圖的
-import matplotlib.pyplot as plt # 繪圖專用
+import matplotlib.pyplot as plt
 import Imgur
-###############################################################################
-#                              股票機器人 技術面分析                            #
-###############################################################################
-#設定顏色
-color=['#2196f3','#4caf50','#ffc107','#f436c7','#f27521','#e00b0b']
+
+# 設定顏色
+color = ['#2196f3', '#4caf50', '#ffc107', '#f436c7', '#f27521', '#e00b0b']
 
 def TheConstructor(userstock):
-    # 設定要的資料時間
-    start = datetime.datetime.now() - datetime.timedelta(days=365) #先設定要爬的時間
+    start = datetime.datetime.now() - datetime.timedelta(days=365)
     end = datetime.date.today()
     
-    # 與yahoo請求
     pd.core.common.is_list_like = pd.api.types.is_list_like
     yf.pdr_override()
     
-    # 取得股票資料
     try:
-        stock = data.get_data_yahoo(userstock+'.TW', start, end)
-
-    except :
-        # 如果失敗回傳"失敗"這張圖
+        stock = data.get_data_yahoo(userstock + '.TW', start, end)
+    except:
         stock = 'https://i.imgur.com/RFmkvQX.jpg'
-        
+    
     return stock
 
-
-
-#---------------------------------------- 股票K線圖 ------------------------------------
-
+# 股票K線圖
 def stock_Candlestick(userstock):
-    stock=TheConstructor(userstock)
+    stock = TheConstructor(userstock)
     
-    if type(stock) == str:
+    if isinstance(stock, str):
         return stock
-    else:
-        fig = plt.figure(figsize=(24, 8))
-        ax = fig.add_subplot(1, 1, 1)
-        ax.set_xticks(range(0, len(stock.index), 5))
-        ax.set_xticklabels(stock.index[::5])
-        plt.xticks(fontsize=10,rotation=90)
-        mpf.candlestick2_ochl(ax, stock['Open'], stock['Close'], stock['High'], stock['Low'],
-                             width=0.5, colorup='r', colordown='green',
-                             alpha=0.6)
-        plt.title("Candlestick_chart") # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Candlestick_chart.png') #存檔
-        plt.close() # 刪除記憶體中的圖片
-        
-        return Imgur.showImgur('Candlestick_chart')
+    
+    fig = plt.figure(figsize=(24, 8))
+    ax = fig.add_subplot(1, 1, 1)
+    ax.set_xticks(range(0, len(stock.index), 5))
+    ax.set_xticklabels(stock.index[::5])
+    plt.xticks(fontsize=10, rotation=90)
+    
+    # 手動繪製K線圖（替代 mpl_finance）
+    for i in range(len(stock)):
+        open_price = stock['Open'].iloc[i]
+        close_price = stock['Close'].iloc[i]
+        high_price = stock['High'].iloc[i]
+        low_price = stock['Low'].iloc[i]
+        color_candle = 'r' if close_price >= open_price else 'g'
+        ax.plot([i, i], [low_price, high_price], color=color_candle, linewidth=1)
+        ax.plot([i, i], [open_price, close_price], color=color_candle, linewidth=3)
+    
+    plt.title("Candlestick Chart")
+    plt.grid(True, axis='y')
+    plt.savefig('Candlestick_chart.png')
+    plt.close()
+    
+    return Imgur.showImgur('Candlestick_chart')
 
-# userstock = "2330"
-# stock_Candlestick(userstock)
-#---------------------------------------- KD指標 ------------------------------------
+# KD指標
 def stock_KD(userstock):
-    stock=TheConstructor(userstock)
+    stock = TheConstructor(userstock)
     
-    if type(stock) == str:
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(list(talib.STOCH(stock['High'], stock['Low'], stock['Close']))).transpose()
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        ret.columns=['K','D','Close']
-        ret.index = stock['Close'].index
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('KD') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('KD.png') #存檔
-        plt.close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('KD') 
     
-# userstock = "2330"
-# stock_KD(userstock)    
-#-------------------------------- 移動平均線（Moving Average）------------------------------------
+    # 手動計算 KD (Stochastic Oscillator)
+    period = 9
+    low_min = stock['Low'].rolling(window=period).min()
+    high_max = stock['High'].rolling(window=period).max()
+    k = 100 * (stock['Close'] - low_min) / (high_max - low_min)
+    d = k.rolling(window=3).mean()
+    
+    ret = pd.DataFrame({'K': k, 'D': d}, index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('KD')
+    plt.grid(True, axis='y')
+    plt.savefig('KD.png')
+    plt.close()
+    return Imgur.showImgur('KD')
+
+# 移動平均線（Moving Average）
 def stock_MA(userstock):
-    stock=TheConstructor(userstock)
+    stock = TheConstructor(userstock)
     
-    if type(stock) == str:
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.SMA(stock['Close'],10), columns= ['10-day average']) #10日移動平均線
-        ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'],20), columns= ['20-day average'])], axis=1) #10日移動平均線
-        ret = pd.concat([ret,pd.DataFrame(talib.SMA(stock['Close'],60), columns= ['60-day average'])], axis=1) #10日移動平均線
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Moving_Average') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Moving_Average.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Moving_Average') 
+    
+    ret = pd.DataFrame({
+        '10-day average': stock['Close'].rolling(window=10).mean(),
+        '20-day average': stock['Close'].rolling(window=20).mean(),
+        '60-day average': stock['Close'].rolling(window=60).mean()
+    }, index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Moving_Average')
+    plt.grid(True, axis='y')
+    plt.savefig('Moving_Average.png')
+    plt.close()
+    return Imgur.showImgur('Moving_Average')
 
-# userstock = "2330"
-# stock_MA(userstock)         
-#-------------------- 指數平滑異同移動平均線（Moving Average Convergence / Divergence）------------------------------------
+# MACD
 def stock_MACD(userstock):
-    stock=TheConstructor(userstock)
-    ret=pd.DataFrame()
+    stock = TheConstructor(userstock)
+    ret = pd.DataFrame()
     
-    if type(stock) == str:
+    if isinstance(stock, str):
         return stock
-    else:
+    
+    ema12 = stock['Close'].ewm(span=12, adjust=False).mean()
+    ema26 = stock['Close'].ewm(span=26, adjust=False).mean()
+    macd = ema12 - ema26
+    signal = macd.ewm(span=9, adjust=False).mean()
+    macd_hist = macd - signal
+    ret['MACD'] = macd
+    ret['MACDsignal'] = signal
+    ret['MACDhist'] = macd_hist
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('MACD')
+    plt.grid(True, axis='y')
+    plt.savefig('MACD.png')
+    plt.close()
+    return Imgur.showImgur('MACD')
 
-        ret['MACD'],ret['MACDsignal'],ret['MACDhist'] = talib.MACD(stock['Close'],fastperiod=6, slowperiod=12, signalperiod=9)
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('MACD') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('MACD.png') #存檔
-        plt.close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('MACD') 
-
-# userstock = "2330"
-# stock_MACD(userstock) 
-#------------------------ 能量潮指標（On Balance Volume）------------------------------------
+# OBV (On Balance Volume)
 def stock_OBV(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.OBV(stock['Close'], stock['Volume']), columns= ['OBV'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('On_Balance_Volume') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('On_Balance_Volume.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('On_Balance_Volume') 
-        
+    
+    # 手動計算 OBV
+    obv = [0]  # 初始值
+    for i in range(1, len(stock)):
+        if stock['Close'].iloc[i] > stock['Close'].iloc[i-1]:
+            obv.append(obv[-1] + stock['Volume'].iloc[i])
+        elif stock['Close'].iloc[i] < stock['Close'].iloc[i-1]:
+            obv.append(obv[-1] - stock['Volume'].iloc[i])
+        else:
+            obv.append(obv[-1])
+    ret = pd.DataFrame(obv, index=stock.index, columns=['OBV'])
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('On_Balance_Volume')
+    plt.grid(True, axis='y')
+    plt.savefig('On_Balance_Volume.png')
+    plt.close()
+    return Imgur.showImgur('On_Balance_Volume')
 
-#------------------------ 威廉指數（Williams Overbought）------------------------------------
+# Williams %R
 def stock_William(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.WILLR(stock['High'], stock['Low'], stock['Open']), columns= ['Williams'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Williams_Overbought') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Williams_Overbought.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Williams_Overbought') 
-        
+    
+    # 手動計算 Williams %R
+    period = 14
+    high_max = stock['High'].rolling(window=period).max()
+    low_min = stock['Low'].rolling(window=period).min()
+    williams = -100 * (high_max - stock['Close']) / (high_max - low_min)
+    ret = pd.DataFrame(williams, columns=['Williams'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Williams_Overbought')
+    plt.grid(True, axis='y')
+    plt.savefig('Williams_Overbought.png')
+    plt.close()
+    return Imgur.showImgur('Williams_Overbought')
 
-#------------------------ 平均真實區域指標（Average True Range）------------------------------------
+# ATR (Average True Range)
 def stock_ATR(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.ATR(stock['High'], stock['Low'], stock['Close']), columns= ['Average True Range'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Average_True_Range') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Average_True_Range.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Average_True_Range') 
-        
+    
+    # 手動計算 ATR
+    tr = pd.DataFrame({
+        'HL': stock['High'] - stock['Low'],
+        'HC': abs(stock['High'] - stock['Close'].shift()),
+        'LC': abs(stock['Low'] - stock['Close'].shift())
+    }).max(axis=1)
+    atr = tr.rolling(window=14).mean()
+    ret = pd.DataFrame(atr, columns=['Average True Range'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Average_True_Range')
+    plt.grid(True, axis='y')
+    plt.savefig('Average_True_Range.png')
+    plt.close()
+    return Imgur.showImgur('Average_True_Range')
 
-#------------------------ 平均趨向指標（Average Directional Indicator）------------------------------------
+# ADX (Average Directional Indicator)
 def stock_ADX(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.ADX(stock['High'], stock['Low'], stock['Close']), columns= ['Average True Range'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Average_Directional_Indicator') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Average_Directional_Indicator.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Average_Directional_Indicator') 
-        
+    
+    # 手動計算 ADX（簡化版，使用 +DI 和 -DI 的平均）
+    tr = pd.DataFrame({
+        'HL': stock['High'] - stock['Low'],
+        'HC': abs(stock['High'] - stock['Close'].shift()),
+        'LC': abs(stock['Low'] - stock['Close'].shift())
+    }).max(axis=1)
+    dm_plus = (stock['High'] - stock['High'].shift()).where(lambda x: x > 0, 0)
+    dm_minus = (stock['Low'].shift() - stock['Low']).where(lambda x: x > 0, 0)
+    atr = tr.rolling(window=14).mean()
+    di_plus = 100 * dm_plus.rolling(window=14).mean() / atr
+    di_minus = 100 * dm_minus.rolling(window=14).mean() / atr
+    dx = 100 * abs(di_plus - di_minus) / (di_plus + di_minus)
+    adx = dx.rolling(window=14).mean()
+    ret = pd.DataFrame(adx, columns=['Average Directional Indicator'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Average_Directional_Indicator')
+    plt.grid(True, axis='y')
+    plt.savefig('Average_Directional_Indicator.png')
+    plt.close()
+    return Imgur.showImgur('Average_Directional_Indicator')
 
-#------------------------ 相對強弱指數（Relative Strength Index）------------------------------------
+# RSI
 def stock_RSI(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        # RSI的天數設定一般是6, 12, 24
-        ret = pd.DataFrame(talib.RSI(stock['Close'],6), columns= ['Relative Strength Index'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title(userstock + 'RSI') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Relative_Strength_Index.png') #存檔
-        plt.close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Relative_Strength_Index') 
-# stock_RSI("2330")
+    
+    delta = stock['Close'].diff()
+    gain = (delta.where(delta > 0, 0)).rolling(window=6).mean()
+    loss = (-delta.where(delta < 0, 0)).rolling(window=6).mean()
+    rs = gain / loss
+    rsi = 100 - (100 / (1 + rs))
+    ret = pd.DataFrame(rsi, columns=['Relative Strength Index'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title(userstock + ' RSI')
+    plt.grid(True, axis='y')
+    plt.savefig('Relative_Strength_Index.png')
+    plt.close()
+    return Imgur.showImgur('Relative_Strength_Index')
 
-#------------------------ 資金流動指標（Money Flow Index）------------------------------------
+# MFI (Money Flow Index)
 def stock_MFI(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.MFI(stock['High'],stock['Low'],stock['Close'],stock['Volume'], timeperiod=14), columns= ['Money Flow Index'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Money_Flow_Index') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Money_Flow_Index.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Money_Flow_Index') 
+    
+    typical_price = (stock['High'] + stock['Low'] + stock['Close']) / 3
+    money_flow = typical_price * stock['Volume']
+    positive_flow = money_flow.where(typical_price > typical_price.shift(), 0).rolling(window=14).sum()
+    negative_flow = money_flow.where(typical_price < typical_price.shift(), 0).rolling(window=14).sum()
+    mfr = positive_flow / negative_flow
+    mfi = 100 - (100 / (1 + mfr))
+    ret = pd.DataFrame(mfi, columns=['Money Flow Index'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Money_Flow_Index')
+    plt.grid(True, axis='y')
+    plt.savefig('Money_Flow_Index.png')
+    plt.close()
+    return Imgur.showImgur('Money_Flow_Index')
 
-#------------ 接收者操作特徵曲線（Receiver Operating Characteristic Curve）------------------------------------
+# ROC (Rate of Change)
 def stock_ROC(userstock):
-    stock=TheConstructor(userstock)
-    if type(stock) == str:
+    stock = TheConstructor(userstock)
+    if isinstance(stock, str):
         return stock
-    else:
-        ret = pd.DataFrame(talib.ROC(stock['Close'], timeperiod=10), columns= ['Receiver Operating Characteristic curve'])
-        ret = pd.concat([ret,stock['Close']], axis=1)
-        
-        ### 開始畫圖 ###
-        ret.plot(color=color, linestyle='dashed')
-        ret['Close'].plot(secondary_y=True,color=color[5])
-        plt.title('Receiver_Operating_Characteristic_Curve') # 標題設定
-        plt.grid(True,axis='y')
-        plt.savefig('Receiver_Operating_Characteristic_Curve.png') #存檔
-        plt. close() # 刪除記憶體中的圖片
-        return Imgur.showImgur('Receiver_Operating_Characteristic_Curve') 
-
-  
+    
+    roc = ((stock['Close'] - stock['Close'].shift(10)) / stock['Close'].shift(10)) * 100
+    ret = pd.DataFrame(roc, columns=['Receiver Operating Characteristic Curve'], index=stock.index)
+    ret = pd.concat([ret, stock['Close']], axis=1)
+    
+    ret.plot(color=color, linestyle='dashed')
+    ret['Close'].plot(secondary_y=True, color=color[5])
+    plt.title('Receiver_Operating_Characteristic_Curve')
+    plt.grid(True, axis='y')
+    plt.savefig('Receiver_Operating_Characteristic_Curve.png')
+    plt.close()
+    return Imgur.showImgur('Receiver_Operating_Characteristic_Curve')
