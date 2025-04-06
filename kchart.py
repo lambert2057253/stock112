@@ -25,53 +25,59 @@ def get_stock_name(stockNumber):
         print(f"[log:ERROR] Failed to get stock name for {stockNumber}: {e}")
         return "no"
 
-def getprice(stockNumber, msg):
+def draw_kchart(stockNumber):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
         return "股票代碼錯誤!"
-    content = ""
-    stock = yf.Ticker(stockNumber + '.TW')
-    hist = stock.history(period="5d")  # 獲取近5天的歷史數據
-    if hist.empty:
-        return "無法獲取股票數據，請確認代碼或稍後再試!"
+    
+    end = datetime.datetime.now()
+    start = end - datetime.timedelta(days=365)
+    
+    try:
+        # 使用 yfinance 獲取數據
+        stock = yf.Ticker(stockNumber + '.TW')
+        hist = stock.history(start=start, end=end)
+        if hist.empty:
+            print(f"[log:ERROR] No data returned for {stockNumber}.TW")
+            return "無法獲取股票數據，請稍後再試！"
         
-        stock.index = stock.index.strftime('%Y-%m-%d')
+        hist.index = hist.index.strftime('%Y-%m-%d')
         
         # 計算移動平均線 (SMA)
-        sma_5 = stock['Close'].rolling(window=5).mean()
-        sma_10 = stock['Close'].rolling(window=10).mean()
-        sma_20 = stock['Close'].rolling(window=20).mean()
-        sma_60 = stock['Close'].rolling(window=60).mean()
+        sma_5 = hist['Close'].rolling(window=5).mean()
+        sma_10 = hist['Close'].rolling(window=10).mean()
+        sma_20 = hist['Close'].rolling(window=20).mean()
+        sma_60 = hist['Close'].rolling(window=60).mean()
         
         # 計算 KD 值 (Stochastic Oscillator)
-        low_min = stock['Low'].rolling(window=9).min()
-        high_max = stock['High'].rolling(window=9).max()
-        stock['k'] = 100 * (stock['Close'] - low_min) / (high_max - low_min)
-        stock['d'] = stock['k'].rolling(window=3).mean()
-        stock['k'].fillna(value=0, inplace=True)
-        stock['d'].fillna(value=0, inplace=True)
+        low_min = hist['Low'].rolling(window=9).min()
+        high_max = hist['High'].rolling(window=9).max()
+        hist['k'] = 100 * (hist['Close'] - low_min) / (high_max - low_min)
+        hist['d'] = hist['k'].rolling(window=3).mean()
+        hist['k'].fillna(value=0, inplace=True)
+        hist['d'].fillna(value=0, inplace=True)
         
         # 繪製圖表
         fig = plt.figure(figsize=(20, 10))
-        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_font)
+        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_title)
         
         # K 線圖和均線
         ax = fig.add_axes([0.1, 0.5, 0.75, 0.4])
         plt.title(
-            f"開盤價: {round(stock['Open'][-1], 2)}  收盤價: {round(stock['Close'][-1], 2)}\n"
-            f"最高價: {round(stock['High'][-1], 2)}  最低價: {round(stock['Low'][-1], 2)}",
+            f"開盤價: {round(hist['Open'][-1], 2)}  收盤價: {round(hist['Close'][-1], 2)}\n"
+            f"最高價: {round(hist['High'][-1], 2)}  最低價: {round(hist['Low'][-1], 2)}",
             fontsize=25, fontweight='bold', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65),
-            loc='left', fontproperties=chinese_font
+            loc='left', fontproperties=chinese_subtitle
         )
-        plt.title(f"更新日期: {stock.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_font)
+        plt.title(f"更新日期: {hist.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_subtitle)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
-        # 手動繪製 K 線（替代 mpf.candlestick2_ochl）
-        for i in range(len(stock)):
-            open_price = stock['Open'].iloc[i]
-            close_price = stock['Close'].iloc[i]
-            high_price = stock['High'].iloc[i]
-            low_price = stock['Low'].iloc[i]
+        # 手動繪製 K 線
+        for i in range(len(hist)):
+            open_price = hist['Open'].iloc[i]
+            close_price = hist['Close'].iloc[i]
+            high_price = hist['High'].iloc[i]
+            low_price = hist['Low'].iloc[i]
             color = 'r' if close_price >= open_price else 'g'
             ax.plot([i, i], [low_price, high_price], color=color, linewidth=1)
             ax.plot([i, i], [open_price, close_price], color=color, linewidth=3)
@@ -83,22 +89,22 @@ def getprice(stockNumber, msg):
         
         # KD 圖
         ax2 = fig.add_axes([0.1, 0.3, 0.75, 0.20])
-        ax2.plot(stock['k'], label='K值', linestyle='-', color='b')
-        ax2.plot(stock['d'], label='D值', linestyle='-', color='orange')
-        ax2.set_xticks(range(0, len(stock.index), 10))
-        ax2.set_xticklabels(stock.index[::10], fontsize=10, rotation=25)
+        ax2.plot(hist['k'], label='K值', linestyle='-', color='b')
+        ax2.plot(hist['d'], label='D值', linestyle='-', color='orange')
+        ax2.set_xticks(range(0, len(hist.index), 10))
+        ax2.set_xticklabels(hist.index[::10], fontsize=10, rotation=25)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 成交量圖
         ax3 = fig.add_axes([0.1, 0.03, 0.75, 0.20])
-        for i in range(len(stock)):
-            open_price = stock['Open'].iloc[i]
-            close_price = stock['Close'].iloc[i]
-            volume = stock['Volume'].iloc[i]
+        for i in range(len(hist)):
+            open_price = hist['Open'].iloc[i]
+            close_price = hist['Close'].iloc[i]
+            volume = hist['Volume'].iloc[i]
             color = 'r' if close_price >= open_price else 'g'
             ax3.bar(i, volume, color=color, alpha=0.8, width=0.5)
-        ax3.set_xticks(range(0, len(stock.index), 10))
-        ax3.set_xticklabels(stock.index[::5], fontsize=10, rotation=45)
+        ax3.set_xticks(range(0, len(hist.index), 10))
+        ax3.set_xticklabels(hist.index[::5], fontsize=10, rotation=45)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 設置圖例
