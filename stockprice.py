@@ -4,17 +4,18 @@
 '''
 import requests
 import datetime
-import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 import yfinance as yf
 from bs4 import BeautifulSoup
 import Imgur
 import matplotlib
-from matplotlib.font_manager import FontProperties # 設定字體
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+
+# 設定中文字體
 chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
 
-
+# Emoji 定義
 emoji_upinfo = u'\U0001F447'
 emoji_midinfo = u'\U0001F538'
 emoji_downinfo = u'\U0001F60A'
@@ -28,17 +29,20 @@ def get_stock_name(stockNumber):
         stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)').text
         return stock_name
     except Exception as e:
-        print(f"Error in get_stock_name: {e}")
+        print(f"[log:ERROR] Error in get_stock_name: {e}")
         return "no"
 
-# 使用者查詢股票
+# 使用者查詢股票即時資訊
 def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
-    if stock_name == "no": return "Invalid stock code!"
+    if stock_name == "no":
+        return "股票代碼錯誤!"
     content = ""
     stock = yf.Ticker(stockNumber + '.TW')
     hist = stock.history(period="5d")  # 獲取近5天的歷史數據
-    if hist.empty: return "No stock data available, please check the code or try again later!"
+    if hist.empty:
+        return "無法獲取股票數據，請確認代碼或稍後再試!"
+    
     date = hist.index[-1].strftime('%Y-%m-%d')
     price = '%.2f' % hist["Close"].iloc[-1]  # 近日收盤價
     last_price = '%.2f' % hist["Close"].iloc[-2]  # 前一日收盤價
@@ -52,9 +56,11 @@ def getprice(stockNumber, msg):
     price_five = hist["Close"].iloc[-5:]  # 近五日收盤價
     stockAverage = '%.2f' % price_five.mean()  # 近五日平均價格
     stockSTD = '%.2f' % price_five.std()  # 近五日標準差
-    content += f"Stock Report for {stock_name}{emoji_upinfo}\n--------------\nDate: {date}\n{emoji_midinfo}Latest Close: {price}\n{emoji_midinfo}Open: {open_price}\n{emoji_midinfo}High: {high_price}\n{emoji_midinfo}Low: {low_price}\n{emoji_midinfo}Change: {spread_price} Change %: {spread_ratio}\n{emoji_midinfo}5-Day Avg Price: {stockAverage}\n{emoji_midinfo}5-Day Std Dev: {stockSTD}\n"
-    if msg.startswith("#"): content += f"--------------\nFor more details, select options below{emoji_downinfo}"
-    else: 
+    
+    content += f"{stock_name} 股票報告{emoji_upinfo}\n--------------\n日期: {date}\n{emoji_midinfo}最新收盤價: {price}\n{emoji_midinfo}開盤價: {open_price}\n{emoji_midinfo}最高價: {high_price}\n{emoji_midinfo}最低價: {low_price}\n{emoji_midinfo}漲跌價差: {spread_price} 漲跌幅: {spread_ratio}\n{emoji_midinfo}五日平均價格: {stockAverage}\n{emoji_midinfo}五日標準差: {stockSTD}\n"
+    if msg.startswith("#"):
+        content += f"--------------\n請選擇下方選項查看更多詳情{emoji_downinfo}"
+    else:
         content += '\n'
     return content
 
@@ -62,7 +68,7 @@ def getprice(stockNumber, msg):
 def stock_trend(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
-        return "Invalid stock code!"
+        return "股票代碼錯誤!"
 
     end = datetime.datetime.now()
     date = end.strftime("%Y%m%d")
@@ -77,14 +83,14 @@ def stock_trend(stockNumber, msg):
         return "no"
     
     plt.figure(figsize=(12, 6))
-    plt.plot(stock_data["Close"], '-', label="Close Price")
-    plt.plot(stock_data["High"], '-', label="High Price")
-    plt.plot(stock_data["Low"], '-', label="Low Price")
-    plt.title(f'{stock_name} Annual Price Trend', loc='center', fontsize=20)
-    plt.xlabel('Date', fontsize=20)
-    plt.ylabel('Price', fontsize=20)
+    plt.plot(stock_data["Close"], '-', label="收盤價")
+    plt.plot(stock_data["High"], '-', label="最高價")
+    plt.plot(stock_data["Low"], '-', label="最低價")
+    plt.title(f'{stock_name} 近一年價格走勢', loc='center', fontsize=20, fontproperties=chinese_font)
+    plt.xlabel('日期', fontsize=20, fontproperties=chinese_font)
+    plt.ylabel('價格', fontsize=20, fontproperties=chinese_font)
     plt.grid(True, axis='y')
-    plt.legend(fontsize=14)
+    plt.legend(fontsize=14, prop=chinese_font)
     plt.savefig(msg + '.png')
     plt.close()
     
@@ -94,7 +100,7 @@ def stock_trend(stockNumber, msg):
 def show_return(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
-        return "Invalid stock code!"
+        return "股票代碼錯誤!"
 
     end = datetime.datetime.now()
     date = end.strftime("%Y%m%d")
@@ -112,12 +118,12 @@ def show_return(stockNumber, msg):
     stock_return = stock_data['Returns'].dropna()
     
     plt.figure(figsize=(12, 6))
-    plt.plot(stock_return, label="Return Rate")
-    plt.title(f'{stock_name} Annual Return Trend', loc='center', fontsize=20)
-    plt.xlabel('Date', fontsize=20)
-    plt.ylabel('Return Rate', fontsize=20)
+    plt.plot(stock_return, label="收益率")
+    plt.title(f'{stock_name} 近一年收益率走勢', loc='center', fontsize=20, fontproperties=chinese_font)
+    plt.xlabel('日期', fontsize=20, fontproperties=chinese_font)
+    plt.ylabel('收益率', fontsize=20, fontproperties=chinese_font)
     plt.grid(True, axis='y')
-    plt.legend(fontsize=14)
+    plt.legend(fontsize=14, prop=chinese_font)
     plt.savefig(msg + '.png')
     plt.close()
     
@@ -127,7 +133,7 @@ def show_return(stockNumber, msg):
 def show_fluctuation(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
-        return "Invalid stock code!"
+        return "股票代碼錯誤!"
 
     end = datetime.datetime.now()
     date = end.strftime("%Y%m%d")
@@ -144,12 +150,12 @@ def show_fluctuation(stockNumber, msg):
     stock_data['stock_fluctuation'] = stock_data["High"] - stock_data["Low"]
     
     plt.figure(figsize=(12, 6))
-    plt.plot(stock_data['stock_fluctuation'], '-', label="Fluctuation", color="orange")
-    plt.title(f'{stock_name} Annual Price Fluctuation', loc='center', fontsize=20)
-    plt.xlabel('Date', fontsize=20)
-    plt.ylabel('Price', fontsize=20)
+    plt.plot(stock_data['stock_fluctuation'], '-', label="震盪幅度", color="orange")
+    plt.title(f'{stock_name} 近一年價格震盪', loc='center', fontsize=20, fontproperties=chinese_font)
+    plt.xlabel('日期', fontsize=20, fontproperties=chinese_font)
+    plt.ylabel('價格', fontsize=20, fontproperties=chinese_font)
     plt.grid(True, axis='y')
-    plt.legend(fontsize=14)
+    plt.legend(fontsize=14, prop=chinese_font)
     plt.savefig(msg + '.png')
     plt.close()
     
