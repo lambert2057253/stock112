@@ -48,7 +48,7 @@ def draw_kchart(stockNumber):
     print("[log:INFO] 開始生成圖表")
     
     # 使用 mplfinance 繪製 K 線圖
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [3, 1]}, sharex=True)
     mpf.plot(
         df,
         type='candle',
