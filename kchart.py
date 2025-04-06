@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import datetime
 import Imgur
 import matplotlib
+import os
 from matplotlib.font_manager import FontProperties
 
 # 設定中文字體
