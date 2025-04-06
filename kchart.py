@@ -34,7 +34,7 @@ def draw_kchart(stockNumber):
     
     try:
         # 使用 pandas_datareader 獲取數據
-        stock = pd.read_data(stockNumber + '.TW', 'yahoo', start=start, end=end)
+        stock = pd.DataReader(stockNumber + '.TW', 'yahoo', start=start, end=end)
         if stock.empty:
             print(f"[log:ERROR] No data returned for {stockNumber}.TW")
             return "無法獲取股票數據，請稍後再試！"
