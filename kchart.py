@@ -1,5 +1,6 @@
 # kchart.py
 import pandas as pd
+import pandas_datareader as pdr
 import requests
 from bs4 import BeautifulSoup
 import datetime
