@@ -7,8 +7,13 @@ import datetime
 import Imgur
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties # 設定中文字體
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
+from matplotlib.font_manager import FontProperties
+
+# 設定中文字體
+font_path = 'msjh.ttf'
+chinese_font = FontProperties(fname=font_path)
+chinese_title = FontProperties(fname=font_path, size=24)
+chinese_subtitle = FontProperties(fname=font_path, size=20)
 
 def get_stock_name(stockNumber):
     try:
@@ -20,6 +25,7 @@ def get_stock_name(stockNumber):
         stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)')
         if stock_name:
             return stock_name.text.strip()
+        print(f"[log:WARNING] No stock name found for {stockNumber}")
         return "no"
     except Exception as e:
         print(f"[log:ERROR] Failed to get stock name for {stockNumber}: {e}")
@@ -59,7 +65,7 @@ def draw_kchart(stockNumber):
         
         # 繪製圖表
         fig = plt.figure(figsize=(20, 10))
-        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_font)
+        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_title)
         
         # K 線圖和均線
         ax = fig.add_axes([0.1, 0.5, 0.75, 0.4])
@@ -67,9 +73,9 @@ def draw_kchart(stockNumber):
             f"開盤價: {round(hist['Open'][-1], 2)}  收盤價: {round(hist['Close'][-1], 2)}\n"
             f"最高價: {round(hist['High'][-1], 2)}  最低價: {round(hist['Low'][-1], 2)}",
             fontsize=25, fontweight='bold', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65),
-            loc='left', fontproperties=chinese_font
+            loc='left', fontproperties=chinese_subtitle
         )
-        plt.title(f"更新日期: {hist.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_font)
+        plt.title(f"更新日期: {hist.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_subtitle)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 手動繪製 K 線
@@ -104,7 +110,7 @@ def draw_kchart(stockNumber):
             color = 'r' if close_price >= open_price else 'g'
             ax3.bar(i, volume, color=color, alpha=0.8, width=0.5)
         ax3.set_xticks(range(0, len(hist.index), 10))
-        ax3.set_xticklabels(hist.index[::5], fontsize=10, rotation=45)
+        ax3.set_xticklabels(hist.index[::10], fontsize=10, rotation=45)  # 修正步長為 10
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 設置圖例
