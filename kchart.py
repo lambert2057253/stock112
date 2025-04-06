@@ -3,8 +3,9 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 import datetime
-import matplotlib.pyplot as plt
 import Imgur
+import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 # 設定中文字體
