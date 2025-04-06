@@ -11,10 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 # 設定中文字體，與 stockprice.py 一致
-font_path = '/opt/render/project/src/msjh.ttf'  # 使用 Render 的絕對路徑
-chinese_font = FontProperties(fname=font_path)
-chinese_title = FontProperties(fname=font_path, size=20)  # 與 stockprice.py 的標題大小一致
-chinese_subtitle = FontProperties(fname=font_path, size=14)  # 與 stockprice.py 的圖例大小一致
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
 
 def get_stock_name(stockNumber):
     try:
@@ -68,9 +65,9 @@ def draw_kchart(stockNumber):
     ax.set_title(
         f"開盤價: {round(df['Open'][-1], 2)} 收盤價: {round(df['Close'][-1], 2)} "
         f"最高價: {round(df['High'][-1], 2)} 最低價: {round(df['Low'][-1], 2)}",
-        fontsize=12, fontweight='bold', loc='left', fontproperties=chinese_subtitle
+        fontsize=12, fontweight='bold', loc='left', fontproperties=chinese_font
     )
-    ax.set_xlabel(f"更新日期: {df.index[-1].strftime('%Y-%m-%d')}", fontsize=12, fontproperties=chinese_subtitle)
+    ax.set_xlabel(f"更新日期: {df.index[-1].strftime('%Y-%m-%d')}", fontsize=12, fontproperties=chinese_font)
     
     # 保存圖表
     plt.savefig("Kchart.png", bbox_inches='tight', dpi=100, pad_inches=0.1)
