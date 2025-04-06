@@ -9,7 +9,9 @@ import Imgur
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
+# 設定中文字體
+font_path = 'msjh.ttf'
+chinese_font = FontProperties(fname=font_path)
 
 def get_stock_name(stockNumber):
     try:
@@ -44,9 +46,17 @@ def draw_kchart(stockNumber):
     print(f"[log:DEBUG] 數據樣本: \n{df.tail(5)}")
 
     print("[log:INFO] 開始生成圖表")
-   mpf.plot(
-        df, type='candle', style='charles', title=f'{stock_name} K線圖',
-        ylabel='價格', volume=True, mav=(5, 10, 20, 60), savefig='kchart.png'
+    mpf.plot(
+        df,
+        type='candle',
+        style='charles',
+        title=f'{stock_name} K線圖',  # 改為中文
+        ylabel='價格',  # 改為中文
+        volume=True,
+        mav=(5, 10, 20, 60),
+        savefig='kchart.png',
+        title_fontproperties=chinese_font,  
+        ylabel_fontproperties=chinese_font  
     )
     
     if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
