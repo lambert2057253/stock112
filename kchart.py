@@ -6,11 +6,11 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import Imgur
+import matplotlib
 from matplotlib.font_manager import FontProperties
 
-# 設定中文字體，與 stockprice.py 一致
-font_path = '/opt/render/project/src/msjh.ttf'  # 使用 Render 的絕對路徑
-chinese_font = FontProperties(fname=font_path)
+# 設定中文字體
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
 
 def get_stock_name(stockNumber):
     try:
@@ -49,8 +49,8 @@ def draw_kchart(stockNumber):
         df,
         type='candle',
         style='charles',
-        title=f'{stock_name} K線圖',  # 改為中文
-        ylabel='價格',  # 改為中文
+        title=f'{stock_name} K線圖',
+        ylabel='價格',
         volume=True,
         mav=(5, 10, 20, 60),
         savefig='kchart.png'
