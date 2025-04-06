@@ -11,17 +11,15 @@ chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入
 
 def get_stock_name(stockNumber):
     try:
-        url = 'https://tw.stock.yahoo.com/q/q?s=' + stockNumber
+        url = f'https://tw.stock.yahoo.com/quote/{stockNumber}.TW'
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         page = requests.get(url, headers=headers)
         page.raise_for_status()
         soup = BeautifulSoup(page.content, 'html.parser')
-        table = soup.find_all(text='成交')
-        if not table:
-            print(f"[log:WARNING] No '成交' found for {stockNumber}")
-            return "no"
-        stock_name = table[0].parent.parent.parent.select('tr')[1].select('td')[0].text.strip('加到投資組合')
-        return stock_name
+        stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)')
+        if stock_name:
+            return stock_name.text.strip()
+        return "no"
     except Exception as e:
         print(f"[log:ERROR] Failed to get stock name for {stockNumber}: {e}")
         return "no"
