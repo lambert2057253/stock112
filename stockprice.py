@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import yfinance as yf
 from bs4 import BeautifulSoup
 import Imgur
+import matplotlib
 from matplotlib.font_manager import FontProperties # 設定字體
 chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
 
