@@ -6,7 +6,6 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import Imgur
-import os
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
@@ -14,8 +13,8 @@ from matplotlib.font_manager import FontProperties
 # 設定全局中文字體
 font_path = '/opt/render/project/src/msjh.ttf'  # 使用 Render 的絕對路徑
 matplotlib.rcParams['font.family'] = 'sans-serif'
-matplotlib.rcParams['font.sans-serif'] = ['Microsoft JhengHei']  # 優先使用 msjh.ttf
-chinese_font = FontProperties(fname=font_path)  # 保留以備後用
+matplotlib.rcParams['font.sans-serif'] = [font_path]  # 直接使用字體檔案路徑
+matplotlib.rcParams['axes.unicode_minus'] = False  # 解決負號顯示問題
 
 def get_stock_name(stockNumber):
     try:
@@ -66,7 +65,7 @@ def draw_kchart(stockNumber):
         return "圖表生成失敗，請稍後再試!"
     
     print(f"[log:INFO] 圖表已保存至 kchart.png")
-    img_url = Imgur.showImgur("Kchart")
+    img_url = Imgur.showImgur("kchart")  # 修正檔案名稱一致性
     if not img_url.startswith("https"):
         print(f"[log:ERROR] Imgur 上傳失敗: {img_url}")
         return "圖片上傳失敗，請稍後再試!"
