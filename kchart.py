@@ -59,7 +59,7 @@ def draw_kchart(stockNumber):
         
         # 繪製圖表
         fig = plt.figure(figsize=(20, 10))
-        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_title)
+        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_font)
         
         # K 線圖和均線
         ax = fig.add_axes([0.1, 0.5, 0.75, 0.4])
@@ -67,9 +67,9 @@ def draw_kchart(stockNumber):
             f"開盤價: {round(hist['Open'][-1], 2)}  收盤價: {round(hist['Close'][-1], 2)}\n"
             f"最高價: {round(hist['High'][-1], 2)}  最低價: {round(hist['Low'][-1], 2)}",
             fontsize=25, fontweight='bold', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65),
-            loc='left', fontproperties=chinese_subtitle
+            loc='left', fontproperties=chinese_font
         )
-        plt.title(f"更新日期: {hist.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_subtitle)
+        plt.title(f"更新日期: {hist.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_font)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 手動繪製 K 線
