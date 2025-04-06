@@ -5,6 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import Imgur
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 import mplfinance as mpf
@@ -14,6 +15,9 @@ font_path = 'msjh.ttf'
 chinese_font = FontProperties(fname=font_path)
 chinese_title = FontProperties(fname=font_path, size=16)
 chinese_subtitle = FontProperties(fname=font_path, size=12)
+
+# 設置全局字體（可選）
+matplotlib.rcParams['font.family'] = 'Microsoft JhengHei'
 
 def get_stock_name(stockNumber):
     try:
@@ -54,7 +58,7 @@ def draw_kchart(stockNumber):
         hist['SMA60'] = hist['Close'].rolling(window=60).mean()
         
         # 繪製 K 線圖
-        fig, ax = plt.subplots(figsize=(12, 6))  # 減小圖表尺寸
+        fig, ax = plt.subplots(figsize=(12, 6))
         mpf.plot(
             hist,
             type='candle',
@@ -64,7 +68,8 @@ def draw_kchart(stockNumber):
             mav=(5, 10, 20, 60),
             ax=ax,
             tight_layout=True,
-            fontfamily='Microsoft JhengHei'  # 使用系統內建中文字體
+            title_fontproperties=chinese_title,  
+            ylabel_fontproperties=chinese_font   
         )
         ax.set_title(
             f"開盤價: {round(hist['Open'][-1], 2)} 收盤價: {round(hist['Close'][-1], 2)} "
@@ -74,7 +79,7 @@ def draw_kchart(stockNumber):
         ax.set_xlabel(f"更新日期: {hist.index[-1].strftime('%Y-%m-%d')}", fontsize=12, fontproperties=chinese_subtitle)
         
         # 保存圖表
-        plt.savefig("Kchart.png", bbox_inches='tight', dpi=100, pad_inches=0.1)  # 降低 DPI
+        plt.savefig("Kchart.png", bbox_inches='tight', dpi=100, pad_inches=0.1)
         plt.close()
         
         # 上傳至 Imgur
