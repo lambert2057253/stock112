@@ -9,6 +9,9 @@ import datetime
 import matplotlib.pyplot as plt
 import Imgur
 import os
+from matplotlib.font_manager import FontProperties # 設定字體
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
+
 
 def get_stock_name(stockNumber):
     try:
