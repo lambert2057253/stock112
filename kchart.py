@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import Imgur
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
