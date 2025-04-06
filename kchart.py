@@ -1,6 +1,6 @@
 # kchart.py
 import pandas as pd
-import pandas_datareader as pdr
+import yfinance as yf
 import requests
 from bs4 import BeautifulSoup
 import datetime
@@ -25,20 +25,15 @@ def get_stock_name(stockNumber):
         print(f"[log:ERROR] Failed to get stock name for {stockNumber}: {e}")
         return "no"
 
-def draw_kchart(stockNumber):
+def getprice(stockNumber, msg):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
         return "股票代碼錯誤!"
-    
-    end = datetime.datetime.now()
-    start = end - datetime.timedelta(days=365)
-    
-    try:
-        # 使用 pandas_datareader 獲取數據
-        stock = pd.DataReader(stockNumber + '.TW', 'yahoo', start=start, end=end)
-        if stock.empty:
-            print(f"[log:ERROR] No data returned for {stockNumber}.TW")
-            return "無法獲取股票數據，請稍後再試！"
+    content = ""
+    stock = yf.Ticker(stockNumber + '.TW')
+    hist = stock.history(period="5d")  # 獲取近5天的歷史數據
+    if hist.empty:
+        return "無法獲取股票數據，請確認代碼或稍後再試!"
         
         stock.index = stock.index.strftime('%Y-%m-%d')
         
