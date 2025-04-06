@@ -10,8 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 # 設定中文字體
-font_path = 'msjh.ttf'
-chinese_font = FontProperties(fname=font_path)
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
 
 def get_stock_name(stockNumber):
     try:
