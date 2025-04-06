@@ -9,8 +9,6 @@ from matplotlib.font_manager import FontProperties
 
 # 設定中文字體
 chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
-chinese_title = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=24) # 引入同個資料夾下支援中文字檔
-chinese_subtitle = matplotlib.font_manager.FontProperties(fname='msjh.ttf', size=20) # 引入同個資料夾下支援中文字檔
 
 def get_stock_name(stockNumber):
     try:
@@ -62,7 +60,7 @@ def draw_kchart(stockNumber):
         
         # 繪製圖表
         fig = plt.figure(figsize=(20, 10))
-        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_title)
+        fig.suptitle(stock_name, fontsize="x-large", fontproperties=chinese_font)
         
         # K 線圖和均線
         ax = fig.add_axes([0.1, 0.5, 0.75, 0.4])
@@ -70,9 +68,9 @@ def draw_kchart(stockNumber):
             f"開盤價: {round(stock['Open'][-1], 2)}  收盤價: {round(stock['Close'][-1], 2)}\n"
             f"最高價: {round(stock['High'][-1], 2)}  最低價: {round(stock['Low'][-1], 2)}",
             fontsize=25, fontweight='bold', bbox=dict(facecolor='yellow', edgecolor='red', alpha=0.65),
-            loc='left', fontproperties=chinese_subtitle
+            loc='left', fontproperties=chinese_font
         )
-        plt.title(f"更新日期: {stock.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_subtitle)
+        plt.title(f"更新日期: {stock.index[-1]}", fontsize=20, fontweight='bold', loc="right", fontproperties=chinese_font)
         plt.grid(True, linestyle="--", color='gray', linewidth='0.5', axis='both')
         
         # 手動繪製 K 線（替代 mpf.candlestick2_ochl）
