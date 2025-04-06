@@ -6,12 +6,11 @@ import requests
 from bs4 import BeautifulSoup
 import datetime
 import Imgur
-import matplotlib
-import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
 # 設定中文字體，與 stockprice.py 一致
-chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf') # 引入同個資料夾下支援中文字檔
+font_path = '/opt/render/project/src/msjh.ttf'  # 使用 Render 的絕對路徑
+chinese_font = FontProperties(fname=font_path)
 
 def get_stock_name(stockNumber):
     try:
@@ -23,10 +22,10 @@ def get_stock_name(stockNumber):
         stock_name = soup.find('h1', class_='C($c-link-text) Fw(b) Fz(24px) Mend(8px)')
         if stock_name:
             return stock_name.text.strip()
-        print(f"[log:WARNING] No stock name found for {stockNumber}")
+        print(f"[log:WARNING] 找不到 {stockNumber} 的股票名稱")
         return "no"
     except Exception as e:
-        print(f"[log:ERROR] Failed to get stock name for {stockNumber}: {e}")
+        print(f"[log:ERROR] 獲取 {stockNumber} 的股票名稱失敗: {e}")
         return "no"
 
 def draw_kchart(stockNumber):
@@ -39,42 +38,30 @@ def draw_kchart(stockNumber):
     stock = yf.Ticker(stockNumber + '.TW')
     df = stock.history(start=start, end=end)
     if df.empty:
-        print(f"[log:ERROR] No data returned for {stockNumber}.TW")
+        print(f"[log:ERROR] 無法獲取 {stockNumber}.TW 的數據")
         return "無法獲取股票數據!"
     
     print(f"[log:DEBUG] 數據形狀: {df.shape}")
     print(f"[log:DEBUG] 數據樣本: \n{df.tail(5)}")
 
     print("[log:INFO] 開始生成圖表")
-    
-    # 使用 mplfinance 繪製 K 線圖
-    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8), gridspec_kw={'height_ratios': [3, 1]}, sharex=True)
     mpf.plot(
         df,
         type='candle',
         style='charles',
-        title=f'{stock_name} K線圖',
-        ylabel='價格',
-        volume=ax2,  
+        title=f'{stock_name} K線圖',  # 改為中文
+        ylabel='價格',  # 改為中文
+        volume=True,
         mav=(5, 10, 20, 60),
-        ax=ax1,
-        tight_layout=True
+        savefig='kchart.png'
     )
     
-    # 添加額外的中文標題和標籤，與 stockprice.py 一致
-    ax.set_title(
-        f"開盤價: {round(df['Open'][-1], 2)} 收盤價: {round(df['Close'][-1], 2)} "
-        f"最高價: {round(df['High'][-1], 2)} 最低價: {round(df['Low'][-1], 2)}",
-        fontsize=12, fontweight='bold', loc='left', fontproperties=chinese_font
-    )
-    ax.set_xlabel(f"更新日期: {df.index[-1].strftime('%Y-%m-%d')}", fontsize=12, fontproperties=chinese_font)
+    if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
+        print(f"[log:ERROR] kchart.png 為空或未創建!")
+        return "圖表生成失敗，請稍後再試!"
     
-    # 保存圖表
-    plt.savefig("Kchart.png", bbox_inches='tight', dpi=100, pad_inches=0.1)
-    plt.close()
-    
-    # 上傳至 Imgur
-    img_url = Imgur.showImgur("Kchart")
+    print(f"[log:INFO] 圖表已保存至 kchart.png")
+    img_url = Imgur.showImgur("kchart")
     if not img_url.startswith("https"):
         print(f"[log:ERROR] Imgur 上傳失敗: {img_url}")
         return "圖片上傳失敗，請稍後再試!"
