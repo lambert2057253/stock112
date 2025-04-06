@@ -55,9 +55,9 @@ def draw_kchart(stockNumber):
         style='charles',
         title=f'{stock_name} K線圖',
         ylabel='價格',
-        volume=True,
+        volume=ax2,  
         mav=(5, 10, 20, 60),
-        ax=ax,
+        ax=ax1,
         tight_layout=True
     )
     
