@@ -7,11 +7,15 @@ from bs4 import BeautifulSoup
 import datetime
 import Imgur
 import os
+import matplotlib
+import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
 
-# 設定中文字體，與 stockprice.py 一致
+# 設定全局中文字體
 font_path = '/opt/render/project/src/msjh.ttf'  # 使用 Render 的絕對路徑
-chinese_font = FontProperties(fname=font_path)
+matplotlib.rcParams['font.family'] = 'sans-serif'
+matplotlib.rcParams['font.sans-serif'] = ['Microsoft JhengHei']  # 優先使用 msjh.ttf
+chinese_font = FontProperties(fname=font_path)  # 保留以備後用
 
 def get_stock_name(stockNumber):
     try:
@@ -50,8 +54,8 @@ def draw_kchart(stockNumber):
         df,
         type='candle',
         style='charles',
-        title=f'{stock_name} K線圖',  # 改為中文
-        ylabel='價格',  # 改為中文
+        title=f'{stock_name} K線圖',
+        ylabel='價格',
         volume=True,
         mav=(5, 10, 20, 60),
         savefig='kchart.png'
@@ -62,7 +66,7 @@ def draw_kchart(stockNumber):
         return "圖表生成失敗，請稍後再試!"
     
     print(f"[log:INFO] 圖表已保存至 kchart.png")
-    img_url = Imgur.showImgur("kchart")
+    img_url = Imgur.showImgur("Kchart")
     if not img_url.startswith("https"):
         print(f"[log:ERROR] Imgur 上傳失敗: {img_url}")
         return "圖片上傳失敗，請稍後再試!"
