@@ -57,8 +57,7 @@ def getprice(stockNumber, msg):
     stockAverage = '%.2f' % price_five.mean()  # 近五日平均價格
     stockSTD = '%.2f' % price_five.std()  # 近五日標準差
     
-    content += f"{stock_name} 股票報告{emoji_upinfo}\n--------------\n日期: {date}\n{emoji_midinfo}最新收盤價: {price}\n{emoji_midinfo}開盤價: {open_price}\n{emoji_midinfo}最高價: {high_price}\n{emoji_midinfo}
-    最低價: {low_price}\n{emoji_midinfo}漲跌價差: {spread_price} 漲跌幅: {spread_ratio}\n{emoji_midinfo}五日平均價格: {stockAverage}\n{emoji_midinfo}五日標準差: {stockSTD}\n"
+    content += f"{stock_name} 股票報告{emoji_upinfo}\n--------------\n日期: {date}\n{emoji_midinfo}最新收盤價: {price}\n{emoji_midinfo}開盤價: {open_price}\n{emoji_midinfo}最高價: {high_price}\n{emoji_midinfo}最低價: {low_price}\n{emoji_midinfo}漲跌價差: {spread_price} 漲跌幅: {spread_ratio}\n{emoji_midinfo}五日平均價格: {stockAverage}\n{emoji_midinfo}五日標準差: {stockSTD}\n"
     if msg.startswith("#"):
         content += f"--------------\n請選擇下方選項查看更多詳情{emoji_downinfo}"
     else:
