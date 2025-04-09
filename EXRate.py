@@ -90,7 +90,7 @@ def spot_exrate_sixMonth(code2):
     if currency_name == "無可支援的外幣": 
         return "無可支援的外幣"  # 若貨幣不受支援，回傳錯誤訊息
     dfs = pd.read_html(f'https://rate.bot.com.tw/xrt/quote/l6m/{code2}')  # 從台灣銀行網站抓取六個月資料
-    currency = dfs[0]. hiloc[:, 0:6]  # 提取前6欄數據
+    currency = dfs[0].iloc[:, 0:6]  # 提取前6欄數據
     currency.columns = [u'Date', u'Currency', u'現金買入', u'現金賣出', u'即期買入', u'即期賣出']  # 設定欄位名稱
     currency[u'Currency'] = currency[u'Currency'].str.extract('\((\w+)\)')  # 提取貨幣代碼
     currency = currency.iloc[::-1]  # 反轉資料順序（從舊到新）
