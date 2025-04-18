@@ -460,6 +460,7 @@ def handle_message(event):
         return 0
     elif re.match("P[0-9]{4}",msg):
         stockNumber = msg[1:]
+        content = Msg_Template.trend_msg
         line_bot_api.push_message(uid, TextSendMessage('稍等一下, 股價走勢繪製中...'))
         trend_imgurl = stockprice.stock_trend(stockNumber, msg)
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=trend_imgurl, preview_image_url=trend_imgurl))
@@ -495,6 +496,7 @@ def handle_message(event):
     # 個股年收益率
     elif re.match('收益率[0-9]',msg):
         targetStock = msg[3:]
+        content = Msg_Template.yield_msg
         line_bot_api.push_message(uid, TextSendMessage(f'分析{targetStock}中，稍等一下。'))
         imgurl2 = stockprice.show_return(targetStock, msg)# 收益率分析圖
         line_bot_api.push_message(uid, ImageSendMessage(original_content_url=imgurl2, preview_image_url=imgurl2))
