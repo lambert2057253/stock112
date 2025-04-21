@@ -7,11 +7,11 @@ import Imgur
 import os
 import matplotlib
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
+from matplotlib.font_manager import FontProperties  # 字體管理模組，用於設定中文字體
 import numpy as np
 
 # 設定中文字體
-chinese_font = FontProperties(fname='msjh.ttf')
+chinese_font = matplotlib.font_manager.FontProperties(fname='msjh.ttf')
 
 # 從 Yahoo Finance 獲取股票名稱
 def get_stock_name(stockNumber):
