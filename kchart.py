@@ -73,22 +73,16 @@ def draw_kchart(stockNumber):
     print(f"[log:DEBUG] 數據樣本: \n{df.tail(5)}")
 
     # 計算技術指標
-    # 1. 移動平均線
-    df['SMA5'] = df['Close'].rolling(window=5).mean()
-    df['SMA10'] = df['Close'].rolling(window=10).mean()
-    df['SMA20'] = df['Close'].rolling(window=20).mean()
-    df['SMA60'] = df['Close'].rolling(window=60).mean()
-
-    # 2. RSI
+    # 1. RSI
     delta = df['Close'].diff()
     gain = delta.where(delta > 0, 0).rolling(window=14).mean()
     loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
     rs = gain / loss
     df['RSI'] = 100 - (100 / (1 + rs))
 
-    # 3. MACD
+    # 2. MACD
     df['EMA12'] = df['Close'].ewm(span=12, adjust=False).mean()
-    df['EMA26'] = df['Close'].ewm(span=26, adjust=False).mean()
+    df['EMA26'] = df['Close'].ewm(span=26, addjust=False).mean()
     df['MACD'] = df['EMA12'] - df['EMA26']
     df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
     df['MACD_Hist'] = df['MACD'] - df['Signal']
@@ -96,13 +90,8 @@ def draw_kchart(stockNumber):
     # 繪製圖表
     fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 12), gridspec_kw={'height_ratios': [3, 1, 1, 1]})
 
-    # 主圖：K 線圖與均線
+    # 主圖：K 線圖（無均線）
     plot_kline(ax1, df, stock_name)
-    ax1.plot(df['SMA5'], label='5日均線', color='blue', linestyle='--')
-    ax1.plot(df['SMA10'], label='10日均線', color='orange', linestyle='--')
-    ax1.plot(df['SMA20'], label='20日均線', color='green', linestyle='--')
-    ax1.plot(df['SMA60'], label='60日均線', color='purple', linestyle='--')
-    ax1.legend(fontsize=10, prop=chinese_font)
 
     # 副圖 1：成交量
     ax2.bar(df.index, df['Volume'], color='gray', alpha=0.5)
