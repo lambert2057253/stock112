@@ -198,9 +198,7 @@ def handle_message(event):
         content = Msg_Template.industrial_artical()
         line_bot_api.push_message(uid, content)
         return 0
-    elif re.match("理財YOUTUBER推薦", msg):
-        content = Msg_Template.youtube_channel()
-        line_bot_api.push_message(uid, content)
+    elif re.match("/新聞", msg):
         return 0
 #===========================================    
     elif re.match('關注[0-9]{4}' ,msg): # 使用者新增股票至股票清單
