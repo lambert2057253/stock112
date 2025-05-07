@@ -52,10 +52,10 @@ def plot_kline(ax, data, stock_name):
     ax.set_xticks(x[::20])  # 每 20 天顯示一個刻度
     ax.set_xticklabels(data.index[::20].strftime('%Y-%m-%d'), rotation=45, fontproperties=chinese_font)
     ax.set_ylabel('價格', fontproperties=chinese_font)
-    ax.set_title(f'{stock_name} K線圖', fontproperties=chinese_font, fontsize=16)
+    ax.set_title(f'{stock_name} K 線圖', fontproperties=chinese_font, fontsize=16)
     ax.grid(True, alpha=0.3)
 
-# 繪製並上傳股票 K 線圖
+# 繪製並上傳獨立圖表
 def draw_kchart(stockNumber):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
@@ -87,53 +87,56 @@ def draw_kchart(stockNumber):
     df['Signal'] = df['MACD'].ewm(span=9, adjust=False).mean()
     df['MACD_Hist'] = df['MACD'] - df['Signal']
 
-    # 繪製圖表
-    fig, (ax1, ax2, ax3, ax4) = plt.subplots(4, 1, figsize=(12, 12), gridspec_kw={'height_ratios': [3, 1, 1, 1]})
-
-    # 主圖：K 線圖（無均線）
+    # 繪製三張獨立圖表
+    # 1. K 線圖
+    plt.figure(figsize=(12, 6))
+    ax1 = plt.gca()
     plot_kline(ax1, df, stock_name)
-
-    # 副圖 1：成交量
-    ax2.bar(df.index, df['Volume'], color='gray', alpha=0.5)
-    ax2.set_ylabel('成交量', fontproperties=chinese_font)
-    ax2.set_title('成交量', fontproperties=chinese_font, fontsize=12)
-    ax2.grid(True, alpha=0.3)
-    ax2.set_xticks([])  # 隱藏 X 軸刻度
-
-    # 副圖 2：RSI
-    ax3.plot(df['RSI'], label='RSI (14)', color='purple')
-    ax3.axhline(70, linestyle='--', color='red', alpha=0.5)  # 超買線
-    ax3.axhline(30, linestyle='--', color='green', alpha=0.5)  # 超賣線
-    ax3.set_ylabel('RSI', fontproperties=chinese_font)
-    ax3.set_title('RSI', fontproperties=chinese_font, fontsize=12)
-    ax3.grid(True, alpha=0.3)
-    ax3.set_xticks([])  # 隱藏 X 軸刻度
-    ax3.legend(fontsize=10, prop=chinese_font)
-
-    # 副圖 3：MACD
-    ax4.plot(df['MACD'], label='MACD', color='blue')
-    ax4.plot(df['Signal'], label='訊號線', color='red')
-    ax4.bar(df.index, df['MACD_Hist'], color='gray', alpha=0.5)
-    ax4.set_ylabel('MACD', fontproperties=chinese_font)
-    ax4.set_title('MACD', fontproperties=chinese_font, fontsize=12)
-    ax4.grid(True, alpha=0.3)
-    ax4.set_xticks(df.index[::20])
-    ax4.set_xticklabels(df.index[::20].strftime('%Y-%m-%d'), rotation=45, fontproperties=chinese_font)
-    ax4.legend(fontsize=10, prop=chinese_font)
-
-    plt.tight_layout()
     plt.savefig('kchart.png')
     plt.close()
 
-    # 檢查圖表檔案
-    if not os.path.exists('kchart.png') or os.path.getsize('kchart.png') == 0:
-        print(f"[log:ERROR] kchart.png 為空或未創建!")
-        return "圖表生成失敗，請稍後再試!"
+    # 2. RSI 圖
+    plt.figure(figsize=(12, 4))
+    ax2 = plt.gca()
+    ax2.plot(df['RSI'], label='RSI (14)', color='purple')
+    ax2.axhline(70, linestyle='--', color='red', alpha=0.5)  # 超買線
+    ax2.axhline(30, linestyle='--', color='green', alpha=0.5)  # 超賣線
+    ax2.set_ylabel('RSI', fontproperties=chinese_font)
+    ax2.set_title(f'{stock_name} RSI', fontproperties=chinese_font, fontsize=16)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_xticks(df.index[::20])
+    ax2.set_xticklabels(df.index[::20].strftime('%Y-%m-%d'), rotation=45, fontproperties=chinese_font)
+    ax2.legend(fontsize=10, prop=chinese_font)
+    plt.savefig('rsi.png')
+    plt.close()
+
+    # 3. MACD 圖
+    plt.figure(figsize=(12, 4))
+    ax3 = plt.gca()
+    ax3.plot(df['MACD'], label='MACD', color='blue')
+    ax3.plot(df['Signal'], label='訊號線', color='red')
+    ax3.bar(df.index, df['MACD_Hist'], color='gray', alpha=0.5)
+    ax3.set_ylabel('MACD', fontproperties=chinese_font)
+    ax3.set_title(f'{stock_name} MACD', fontproperties=chinese_font, fontsize=16)
+    ax3.grid(True, alpha=0.3)
+    ax3.set_xticks(df.index[::20])
+    ax3.set_xticklabels(df.index[::20].strftime('%Y-%m-%d'), rotation=45, fontproperties=chinese_font)
+    ax3.legend(fontsize=10, prop=chinese_font)
+    plt.savefig('macd.png')
+    plt.close()
+
+    # 檢查圖表檔案並上傳
+    for chart_file in ['kchart.png', 'rsi.png', 'macd.png']:
+        if not os.path.exists(chart_file) or os.path.getsize(chart_file) == 0:
+            print(f"[log:ERROR] {chart_file} 為空或未創建!")
+            return f"{chart_file} 生成失敗，請稍後再試!"
     
-    print(f"[log:INFO] 圖表已保存至 kchart.png")
-    img_url = Imgur.showImgur("kchart")
-    if not img_url.startswith("https"):
-        print(f"[log:ERROR] Imgur 上傳失敗: {img_url}")
-        return "圖片上傳失敗，請稍後再試!"
-    print(f"[log:INFO] 圖表已上傳: {img_url}")
-    return img_url
+    print(f"[log:INFO] 圖表已保存: kchart.png, rsi.png, macd.png")
+    img_urls = {}
+    for chart_file in ['kchart', 'rsi', 'macd']:
+        img_url = Imgur.showImgur(f"{chart_file}")
+        if not img_url.startswith("https"):
+            print(f"[log:ERROR] Imgur 上傳 {chart_file}.png 失敗: {img_url}")
+            return f"{chart_file}.png 上傳失敗，請稍後再試!"
+        img_urls[chart_file] = img_url
+        print(f"[log:INFO] {chart_file}.png 已上傳: {img_url}")
