@@ -55,8 +55,8 @@ def plot_kline(ax, data, stock_name):
     ax.set_title(f'{stock_name} K 線圖', fontproperties=chinese_font, fontsize=16)
     ax.grid(True, alpha=0.3)
 
-# 繪製並上傳獨立圖表
-def draw_kchart(stockNumber):
+# 繪製並推送三張圖表到 Line Bot
+def draw_kchart(stockNumber, line_bot_api, uid):
     stock_name = get_stock_name(stockNumber)
     if stock_name == "no":
         return "股票代碼錯誤!"
@@ -94,6 +94,10 @@ def draw_kchart(stockNumber):
     plot_kline(ax1, df, stock_name)
     plt.savefig('kchart.png')
     plt.close()
+    kchart_url = Imgur.showImgur("kchart")
+    if not kchart_url.startswith("https"):
+        print(f"[log:ERROR] Imgur 上傳 kchart.png 失敗: {kchart_url}")
+        return "K 線圖上傳失敗，請稍後再試!"
 
     # 2. RSI 圖
     plt.figure(figsize=(12, 4))
@@ -109,6 +113,10 @@ def draw_kchart(stockNumber):
     ax2.legend(fontsize=10, prop=chinese_font)
     plt.savefig('rsi.png')
     plt.close()
+    rsi_url = Imgur.showImgur("rsi")
+    if not rsi_url.startswith("https"):
+        print(f"[log:ERROR] Imgur 上傳 rsi.png 失敗: {rsi_url}")
+        return "RSI 圖上傳失敗，請稍後再試!"
 
     # 3. MACD 圖
     plt.figure(figsize=(12, 4))
@@ -124,21 +132,24 @@ def draw_kchart(stockNumber):
     ax3.legend(fontsize=10, prop=chinese_font)
     plt.savefig('macd.png')
     plt.close()
+    macd_url = Imgur.showImgur("macd")
+    if not macd_url.startswith("https"):
+        print(f"[log:ERROR] Imgur 上傳 macd.png 失敗: {macd_url}")
+        return "MACD 圖上傳失敗，請稍後再試!"
 
-    # 檢查圖表檔案並上傳
+    # 檢查圖表檔案並推送至 Line Bot
     for chart_file in ['kchart.png', 'rsi.png', 'macd.png']:
         if not os.path.exists(chart_file) or os.path.getsize(chart_file) == 0:
             print(f"[log:ERROR] {chart_file} 為空或未創建!")
             return f"{chart_file} 生成失敗，請稍後再試!"
-    
-    print(f"[log:INFO] 圖表已保存: kchart.png, rsi.png, macd.png")
-    img_urls = {}
-    for chart_file in ['kchart', 'rsi', 'macd']:
-        img_url = Imgur.showImgur(f"{chart_file}")
-        if not img_url.startswith("https"):
-            print(f"[log:ERROR] Imgur 上傳 {chart_file}.png 失敗: {img_url}")
-            return f"{chart_file}.png 上傳失敗，請稍後再試!"
-        img_urls[chart_file] = img_url
-        print(f"[log:INFO] {chart_file}.png 已上傳: {img_url}")
-# 回傳三張圖的 URL
-    return f"K 線圖: {img_urls['kchart']}\nRSI: {img_urls['rsi']}\nMACD: {img_urls['macd']}"
+
+    print(f"[log:INFO] 圖表已保存並上傳: kchart.png, rsi.png, macd.png")
+    try:
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=kchart_url, preview_image_url=kchart_url))
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=rsi_url, preview_image_url=rsi_url))
+        line_bot_api.push_message(uid, ImageSendMessage(original_content_url=macd_url, preview_image_url=macd_url))
+        print(f"[log:INFO] 三張圖片已成功推送至用戶 {uid}")
+        return "圖表已成功推送！"
+    except Exception as e:
+        print(f"[log:ERROR] 推送圖片失敗: {str(e)}")
+        return f"推送圖片失敗: {str(e)}"
