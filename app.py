@@ -468,7 +468,7 @@ def handle_message(event):
         return 0
     elif re.match("K[0-9]{4}", msg):
         stockNumber = msg[1:]
-        content = Msg_Template.kchart_msg + "\n" + Msg_Template.kd_msg
+        content = Msg_Template.kchart_msg
         line_bot_api.push_message(uid, TextSendMessage(content))
         line_bot_api.push_message(uid, TextSendMessage('稍等一下, K線圖繪製中...'))
         k_imgurl = kchart.draw_kchart(stockNumber)
