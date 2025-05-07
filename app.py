@@ -470,12 +470,17 @@ def handle_message(event):
         stockNumber = msg[1:]
         content = Msg_Template.kchart_msg
         line_bot_api.push_message(uid, TextSendMessage(content))
-        line_bot_api.push_message(uid, TextSendMessage('稍等一下, K線圖繪製中...'))
-        k_imgurl = kchart.draw_kchart(stockNumber)
-        if k_imgurl.startswith("https"):
-            line_bot_api.push_message(uid, ImageSendMessage(original_content_url=k_imgurl, preview_image_url=k_imgurl))
+        line_bot_api.push_message(uid, TextSendMessage('稍等一下，K線圖繪製中...'))
+        k_imgurls = kchart.draw_kchart(stockNumber)
+        if isinstance(k_imgurls, list) and all(url.startswith("https") for url in k_imgurls):
+            for url in k_imgurls:
+                line_bot_api.push_message(uid, ImageSendMessage(
+                    original_content_url=url,
+                    preview_image_url=url
+                ))
         else:
-            line_bot_api.push_message(uid, TextSendMessage(k_imgurl))
+            line_bot_api.push_message(uid, TextSendMessage("圖表生成失敗，請稍後再試！"))
+
         btn_msg = Msg_Template.stock_reply_other(stockNumber)
         line_bot_api.push_message(uid, btn_msg)
         return 0
