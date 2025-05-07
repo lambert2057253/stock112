@@ -140,3 +140,5 @@ def draw_kchart(stockNumber):
             return f"{chart_file}.png 上傳失敗，請稍後再試!"
         img_urls[chart_file] = img_url
         print(f"[log:INFO] {chart_file}.png 已上傳: {img_url}")
+# 回傳三張圖的 URL
+    return f"K 線圖: {img_urls['kchart']}\nRSI: {img_urls['rsi']}\nMACD: {img_urls['macd']}"
