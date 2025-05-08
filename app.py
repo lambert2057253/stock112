@@ -200,6 +200,8 @@ def handle_message(event):
         return 0
     elif re.match("/新聞", msg):
         return 0
+    elif re.match("/健檢", msg):
+        return 0
 #===========================================    
     elif re.match('關注[0-9]{4}' ,msg): # 使用者新增股票至股票清單
         stockNumber = msg[2:6]
