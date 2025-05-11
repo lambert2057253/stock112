@@ -1089,18 +1089,6 @@ def stock_reply(stockNumber, content_text):
                                 text = content_text ,
                                quick_reply=QuickReply(
                                    items=[
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="關注", 
-                                                    text="關注"+stockNumber,
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="取消關注", 
-                                                    text="刪除"+stockNumber,
-                                                )
-                                       ),
                                         QuickReplyButton(
                                                 action=MessageAction(
                                                     label="走勢圖", 
@@ -1141,139 +1129,56 @@ def stock_reply(stockNumber, content_text):
                             ))
     return text_message
 def stock_reply_other(stockNumber):
-    # 定義 Flex Message 的內容
-    bubble = BubbleContainer(
-        header=BoxComponent(
-            layout="vertical",
-            contents=[
-                TextComponent(text="想知道更多？", weight="bold", size="lg", align="center")
-            ]
-        ),
-        body=BoxComponent(
-            layout="vertical",
-            contents=[
-                # 圖片按鈕區域，使用水平佈局分組
-                BoxComponent(
-                    layout="horizontal",
-                    contents=[
-                        # 即時股價
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/S3FJWc0.png",
-                                    size="full",
-                                    action=MessageAction(label="即時股價", text=f"#{stockNumber}")
-                                ),
-                                TextComponent(text="即時股價", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                        # 走勢圖
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/jms3OYy.png",
-                                    size="full",
-                                    action=MessageAction(label="走勢圖", text=f"P{stockNumber}")
-                                ),
-                                TextComponent(text="走勢圖", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                    ]
-                ),
-                # 第二行圖片
-                BoxComponent(
-                    layout="horizontal",
-                    contents=[
-                        # K線圖
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/wbcb1Mx.png",
-                                    size="full",
-                                    action=MessageAction(label="K線圖", text=f"K{stockNumber}")
-                                ),
-                                TextComponent(text="K線圖", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                        # 法人
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/FlzTQLZ.png",
-                                    size="full",
-                                    action=MessageAction(label="法人", text=f"F{stockNumber}")
-                                ),
-                                TextComponent(text="法人", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                    ]
-                ),
-                # 第三行圖片
-                BoxComponent(
-                    layout="horizontal",
-                    contents=[
-                        # 三大面向分析
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/RJjBOJj.png",
-                                    size="full",
-                                    action=MessageAction(label="三大面向分析", text=f"三大面向分析{stockNumber}")
-                                ),
-                                TextComponent(text="三大面向分析", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                        # 新聞
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/Q7Ld09G.png",
-                                    size="full",
-                                    action=MessageAction(label="新聞", text=f"N{stockNumber}")
-                                ),
-                                TextComponent(text="新聞", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                    ]
-                ),
-                # 第四行圖片（單獨一行）
-                BoxComponent(
-                    layout="horizontal",
-                    contents=[
-                        # 年收益率
-                        BoxComponent(
-                            layout="vertical",
-                            contents=[
-                                ImageComponent(
-                                    url="https://i.imgur.com/9HHtwyR.png",
-                                    size="full",
-                                    action=MessageAction(label="年收益率", text=f"收益率{stockNumber}")
-                                ),
-                                TextComponent(text="年收益率", size="xs", align="center", color="#666666")
-                            ],
-                            padding_all="5px"
-                        ),
-                    ]
-                ),
-            ]
-        )
-    )
-    # 返回 FlexSendMessage
-    flex_message = FlexSendMessage(alt_text="想知道更多？", contents=bubble)
-    return flex_message
-
+    content_text = "想知道更多?"
+    text_message = TextSendMessage(
+                                text = content_text ,
+                               quick_reply=QuickReply(
+                                   items=[
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="即時股價", 
+                                                    text="#"+stockNumber,
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="走勢圖", 
+                                                    text="P"+stockNumber,
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="K線圖", 
+                                                    text="K"+stockNumber
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="法人", 
+                                                    text="F"+stockNumber
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="三大面向分析", 
+                                                    text= "三大面向分析"+stockNumber
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="新聞", 
+                                                    text= "N"+stockNumber
+                                                )
+                                       ),
+                                       QuickReplyButton(
+                                                action=MessageAction(
+                                                    label="年收益率", 
+                                                    text= "收益率" + stockNumber
+                                                )
+                                       ),
+                                ]
+                            ))
+    return text_message
 # 股票三大面向分析(查詢股價配合quick repay)
 def stock_ananlysis_menu(stockNumber):
     flex_message = FlexSendMessage(
