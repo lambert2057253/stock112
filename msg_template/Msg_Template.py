@@ -1270,6 +1270,8 @@ def stock_reply_other(stockNumber):
             ]
         )
     )
+    # 返回 FlexSendMessage
+    flex_message = FlexSendMessage(alt_text="想知道更多？", contents=bubble)
     return flex_message
 
 # 股票三大面向分析(查詢股價配合quick repay)
