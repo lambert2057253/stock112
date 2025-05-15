@@ -1087,6 +1087,33 @@ def fin_books():
 def stock_reply(stockNumber, content_text):
     text_message = TextSendMessage(
                                 text = content_text ,
+                                contents=
+                                      {
+                                          "type": "carousel",
+                                          "contents": [
+                                              {
+                                              "type": "bubble",
+                                              "size": "micro",
+                                              "hero": {
+                                                  "type": "image",
+                                                  "url": "https://imgur.com/hUWBRhe.jpg",
+                                                  "aspectMode": "fit",
+                                                  "aspectRatio": "320:213",
+                                                  "size": "full",
+                                                  "backgroundColor": "#DDDDDD"
+                                              },
+                                              "body": {
+                                                  "type": "box",
+                                                  "layout": "vertical",
+                                                  "contents": [
+                                                  {
+                                                      "type": "text",
+                                                      "text": "富爸爸，窮爸爸",
+                                                      "weight": "bold",
+                                                      "size": "md",
+                                                      "wrap": True,
+                                                      "align": "center"
+                                                  },
                                quick_reply=QuickReply(
                                    items=[
                                         QuickReplyButton(
