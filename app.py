@@ -291,7 +291,7 @@ def handle_message(event):
         else:          
             line_bot_api.push_message(uid, TextSendMessage(f'稍等一下, 查詢編號: {stockNumber} 的股價中...'))
             content_text = stockprice.getprice(stockNumber, msg)
-            content = Msg_Template.stock_reply(stockNumber, content_text)
+            content = Msg_Template.stock_reply(stockNumber)
             line_bot_api.push_message(uid, content)
         return 0
     elif re.match("三大面向分析[0-9]", msg):
