@@ -1084,101 +1084,282 @@ def fin_books():
         )
     return flex_message
 # 股票 quick reply(給#代碼指令)
-def stock_reply(stockNumber, content_text):
-    text_message = TextSendMessage(
-                                text = content_text ,
-                               quick_reply=QuickReply(
-                                   items=[
-                                        QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="走勢圖", 
-                                                    text="P"+stockNumber,
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="K線圖", 
-                                                    text="K"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="法人", 
-                                                    text="F"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="三大面向分析", 
-                                                    text= "三大面向分析"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="新聞", 
-                                                    text= "N"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="年收益率", 
-                                                    text= "收益率" + stockNumber
-                                                )
-                                       ),
-                                ]
-                            ))
+def stock_reply(stockNumber):
+    return FlexSendMessage(
+        alt_text="股票功能選單",
+        contents={
+            "type": "carousel",
+            "contents": [
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/走勢圖.jpg",  # 走勢圖圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213",
+                        "backgroundColor": "#FFFFFF"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "走勢圖", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"P{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/K線圖.jpg",  # K線圖圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "K線圖", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"K{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/法人.jpg",  # 法人圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "法人", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"F{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/三大分析.jpg",  # 三大面向
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "三大面向分析", "weight": "bold", "size": "sm", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"三大面向分析{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/新聞.jpg",  # 新聞
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "新聞", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"N{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/年收益率.jpg",  # 年收益率
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "年收益率", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"收益率{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                }
+            ]
+        }
+    )
     return text_message
+  
 def stock_reply_other(stockNumber):
-    content_text = "想知道更多?"
-    text_message = TextSendMessage(
-                                text = content_text ,
-                               quick_reply=QuickReply(
-                                   items=[
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="即時股價", 
-                                                    text="#"+stockNumber,
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="走勢圖", 
-                                                    text="P"+stockNumber,
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="K線圖", 
-                                                    text="K"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="法人", 
-                                                    text="F"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="三大面向分析", 
-                                                    text= "三大面向分析"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="新聞", 
-                                                    text= "N"+stockNumber
-                                                )
-                                       ),
-                                       QuickReplyButton(
-                                                action=MessageAction(
-                                                    label="年收益率", 
-                                                    text= "收益率" + stockNumber
-                                                )
-                                       ),
-                                ]
-                            ))
+    return FlexSendMessage(
+        alt_text="股票功能選單",
+        contents={
+            "type": "carousel",
+            "contents": [
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/走勢圖.jpg",  # 走勢圖圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213",
+                        "backgroundColor": "#FFFFFF"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "走勢圖", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"P{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/K線圖.jpg",  # K線圖圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "K線圖", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"K{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/法人.jpg",  # 法人圖示
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "法人", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"F{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/三大分析.jpg",  # 三大面向
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "三大面向分析", "weight": "bold", "size": "sm", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"三大面向分析{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/新聞.jpg",  # 新聞
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "新聞", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"N{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                },
+                {
+                    "type": "bubble",
+                    "size": "micro",
+                    "hero": {
+                        "type": "image",
+                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/年收益率.jpg",  # 年收益率
+                        "size": "full",
+                        "aspectMode": "cover",
+                        "aspectRatio": "320:213"
+                    },
+                    "body": {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [
+                            {"type": "text", "text": "年收益率", "weight": "bold", "size": "md", "align": "center"},
+                            {"type": "button", "action": {"type": "message", "label": "查看", "text": f"收益率{stockNumber}"}, "style": "link", "height": "sm"}
+                        ],
+                        "spacing": "sm",
+                        "paddingAll": "13px"
+                    }
+                }
+            ]
+        }
+    )
     return text_message
+
 # 股票三大面向分析(查詢股價配合quick repay)
 def stock_ananlysis_menu(stockNumber):
     flex_message = FlexSendMessage(
