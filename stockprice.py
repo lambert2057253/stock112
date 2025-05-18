@@ -83,6 +83,8 @@ def stock_trend(stockNumber, msg):
     if stock_data.empty:
         print(f"[log:ERROR] No trend data for {stockNumber}.TW")
         return "no"
+
+    stock_data.index = stock_data.index.astype(str) # 將索引轉為字符串
     
     # 計算技術指標
     stock_data['SMA10'] = stock_data['Close'].rolling(window=10).mean()  # 10日均線
