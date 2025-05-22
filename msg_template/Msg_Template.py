@@ -1082,7 +1082,7 @@ def fin_books():
                 ]
             }
         )
-    return flex_message
+    return text_message
 # 股票 quick reply(給#代碼指令)
 def stock_reply(stockNumber):
     return FlexSendMessage(
