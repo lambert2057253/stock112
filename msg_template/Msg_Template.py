@@ -849,7 +849,7 @@ def fin_books():
                     "size": "micro",
                     "hero": {
                         "type": "image",
-                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/羅斯柴爾德.jpg",
+                        "url": "https://imgur.com/hUWBRhe.jpg",
                         "aspectMode": "fit",
                         "aspectRatio": "320:213",
                         "size": "full",
@@ -861,7 +861,7 @@ def fin_books():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "羅斯柴爾德：世界上最有錢的家族，沒有之一",
+                            "text": "富爸爸，窮爸爸",
                             "weight": "bold",
                             "size": "md",
                             "wrap": True,
@@ -877,7 +877,7 @@ def fin_books():
                             },
                             {
                                 "type": "text",
-                                "text": "掌控世界金融的家族祕密",
+                                "text": "暢銷二十年的經典",
                                 "size": "xs",
                                 "color": "#8c8c8c",
                                 "margin": "md",
@@ -893,7 +893,7 @@ def fin_books():
                             "action": {
                             "type": "uri",
                             "label": "點我觀看",
-                            "uri": " https://www.books.com.tw/products/0011019276?loc=P_0003_004"
+                            "uri": "https://www.books.com.tw/products/0010720289"
                             }
                         },
                         {
@@ -927,7 +927,7 @@ def fin_books():
                     "size": "micro",
                     "hero": {
                         "type": "image",
-                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/經濟評論家父親給兒子的一封信.jpg",
+                        "url": "https://imgur.com/YYlesvX.jpg",
                         "size": "full",
                         "aspectMode": "fit",
                         "aspectRatio": "320:213",
@@ -939,7 +939,7 @@ def fin_books():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "經濟評論家父親給兒子的一封信：關於金錢、人生與幸福",
+                            "text": "思考致富聖經",
                             "weight": "bold",
                             "size": "md",
                             "wrap": True,
@@ -955,7 +955,7 @@ def fin_books():
                             },
                             {
                                 "type": "text",
-                                "text": "18封信教你聰明致富",
+                                "text": "13個致富關鍵",
                                 "size": "xs",
                                 "color": "#8c8c8c",
                                 "margin": "md",
@@ -971,7 +971,7 @@ def fin_books():
                             "action": {
                             "type": "uri",
                             "label": "點我觀看",
-                            "uri": "https://www.books.com.tw/products/0011014595"
+                            "uri": "https://www.books.com.tw/products/0010654650"
                             }
                         },
                         {
@@ -1005,7 +1005,7 @@ def fin_books():
                     "size": "micro",
                     "hero": {
                         "type": "image",
-                        "url": "https://raw.githubusercontent.com/90polarbear/stock112/main/img/全面交易3.0.jpg",
+                        "url": "https://imgur.com/uFhehyq.jpg",
                         "size": "full",
                         "aspectMode": "fit",
                         "aspectRatio": "320:213",
@@ -1017,7 +1017,7 @@ def fin_books():
                         "contents": [
                         {
                             "type": "text",
-                            "text": "全面交易3.0：掌握當沖與波段交易的獲利技巧",
+                            "text": "有錢人想的和你不一樣",
                             "weight": "bold",
                             "size": "md",
                             "wrap": True,
@@ -1033,7 +1033,7 @@ def fin_books():
                             },
                             {
                                 "type": "text",
-                                "text": "交易大師的獲利密碼",
+                                "text": "17種致富思考方式",
                                 "size": "xs",
                                 "color": "#8c8c8c",
                                 "margin": "md",
@@ -1049,7 +1049,7 @@ def fin_books():
                             "action": {
                             "type": "uri",
                             "label": "點我觀看",
-                            "uri": "https://www.books.com.tw/products/0011020891?loc=P_0104_1_001"
+                            "uri": "https://www.books.com.tw/products/0010316121?loc=P_asb_001"
                             }
                         },
                         {
@@ -1082,7 +1082,8 @@ def fin_books():
                 ]
             }
         )
-    return text_message
+    return flex_message
+    
 # 股票 quick reply(給#代碼指令)
 def stock_reply(stockNumber):
     return FlexSendMessage(
